@@ -1,0 +1,97 @@
+/*
+ * Design tokens from the Figma file "334 Main Course Project" (Prototyping stage 4).
+ * Colours, effects and text styles copy the Figma variables/styles exactly.
+ * Spacing is the single system the user approved: Home's 32 / 24 / 24, radius 16.
+ */
+:root {
+  /* Colours */
+  --accent: #5b4fe0;
+  --accent-hover: #4b3fcb;
+  --accent-tint: #eeedfd;
+  --text-accent: #4b3fcb;
+  --on-accent: #ffffff;
+  --text-1: #14181f;
+  --text-2: #5b6472;
+  --text-3: #9aa2ae;
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --border: #e2e5ea;
+  --border-strong: #cdd2d9;
+  --positive: #1e8e5a;
+  --positive-tint: #e7f6ee;
+  --warning: #b7791f;
+  --warning-tint: #fdf3e1;
+  --negative: #c8372d;
+  --negative-tint: #fbeae8;
+  --info: #2f6bd8;
+  --funnel-1: #5b4fe0;
+  --funnel-2: #6a5ee5;
+  --funnel-3: #a9a2f2;
+  --funnel-4: #c9c4f7;
+  --funnel-5: #e4e1fb;
+  --cover-from: #0e0d22;
+  --cover-to: #2f2775;
+  --thumb-from: #1e2430;
+  --thumb-to: #120f2e;
+
+  /* Effects */
+  --shadow-card: 0 1px 2px rgba(20, 24, 31, 0.05), 0 4px 12px rgba(20, 24, 31, 0.05);
+  --shadow-modal: 0 24px 48px -8px rgba(20, 24, 31, 0.18);
+  --scrim: rgba(20, 24, 31, 0.4);
+
+  /* Layout: one system for every page */
+  --sidebar-w: 80px;
+  --topbar-h: 64px;
+  --page-margin: 32px;
+  --page-margin-bottom: 48px;
+  --section-gap: 24px;
+  --card-gap: 24px;
+  --card-padding: 24px;
+  --card-inner-gap: 20px;
+  --row-gap: 20px;
+  --list-gap: 12px;
+  --radius-card: 16px;
+  --radius-inner: 8px;
+  --radius-control: 6px;
+  --radius-pill: 999px;
+
+  /* Fonts */
+  --font-head: 'Poppins', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+}
+
+/* ---------- Figma text styles (never change sizes) ---------- */
+.t-h1 { font: 600 48px/normal var(--font-head); }
+.t-h2 { font: 600 36px/normal var(--font-head); }
+.t-h3 { font: 500 28px/normal var(--font-head); }
+.t-h4 { font: 500 20px/normal var(--font-head); }
+.t-sub5 { font: 600 16px/normal var(--font-head); }
+.t-card-number { font: 600 24px/normal var(--font-head); }
+.t-overview-header { font: 500 12px/normal var(--font-head); }
+.t-tag { font: 500 8px/normal var(--font-head); }
+
+.t-body { font: 500 16px/1.4 var(--font-body); letter-spacing: -0.01em; }
+.t-body-2 { font: 400 14px/1.4 var(--font-body); letter-spacing: -0.01em; }
+.t-btn { font: 500 14px/1.4 var(--font-body); letter-spacing: -0.01em; }
+.t-btn-bold { font: 600 14px/1.4 var(--font-body); letter-spacing: -0.01em; }
+.t-banner { font: 600 12px/normal var(--font-body); }
+.t-sub2 { font: 500 12px/normal var(--font-body); }
+.t-card-sub2 { font: 500 8px/normal var(--font-body); }
+
+/* Figma's "GT America Mono Trial" styles (Analytics). The user chose no mono font:
+ * each one uses the matching app style at the same Figma size and weight. */
+.t-mono-1 { font: 600 16px/normal var(--font-head); }                          /* Mono 1 (Bd 16) → Subheader 5 */
+.t-mono-2 { font: 500 16px/normal var(--font-body); letter-spacing: -0.01em; } /* Mono 2 (Rg 16) → Body copy */
+.t-mono-3 { font: 500 12px/normal var(--font-body); }                           /* Mono 3 (Md 12) → Subheader 2 */
+.t-mono-4 { font: 600 12px/normal var(--font-body); }                           /* Mono 4 (Bd 12) → Banner text */
+.t-metrics-mono { font: 500 8px/normal var(--font-body); }                      /* Metrics Mono (Md 8) → Card Subheader 2 */
+
+/* Colour helpers */
+.c-1 { color: var(--text-1); }
+.c-2 { color: var(--text-2); }
+.c-3 { color: var(--text-3); }
+.c-accent { color: var(--text-accent); }
+.c-positive { color: var(--positive); }
+.c-warning { color: var(--warning); }
+.c-negative { color: var(--negative); }
+.c-white { color: var(--on-accent); }

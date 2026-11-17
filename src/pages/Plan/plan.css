@@ -1,0 +1,974 @@
+/* ---------- Page title row ---------- */
+.plan-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.edit-ms-btn {
+  border-radius: 8px;
+  height: 36px;
+  padding: 0 14px;
+  gap: 8px;
+  color: var(--text-2);
+}
+
+/* ---------- Upcoming milestone hero (Figma sizes kept exactly) ---------- */
+.hero {
+  display: grid;
+  grid-template-columns: 35% 1fr;
+  min-height: 250px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.hero__left {
+  background: var(--accent-tint);
+  padding: 31px 37px 28px;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero__right {
+  padding: 31px 37px 28px 38px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.hero-heading {
+  font: 600 25.961px/normal var(--font-head);
+  text-transform: uppercase;
+  color: #000;
+}
+
+.hero-count {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  margin-top: -4px;
+}
+
+.hero-count__num {
+  font: 600 89.008px/1 var(--font-head);
+  color: var(--text-accent);
+}
+
+.hero-count__days {
+  font: 600 25.961px/normal var(--font-head);
+  color: #000;
+}
+
+.hero-date {
+  font: 500 25.961px/normal var(--font-head);
+  color: #000;
+  text-decoration: underline;
+  text-underline-position: from-font;
+  align-self: flex-start;
+  margin-top: 6px;
+}
+.hero-date:hover {
+  color: var(--text-accent);
+}
+
+.hero-goals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 31px;
+  max-width: 980px;
+}
+
+.hero-goal {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-pill {
+  align-self: flex-start;
+  height: 28px;
+  border-radius: 14.122px;
+  background: var(--accent-tint);
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  font: 600 11.467px/normal var(--font-head);
+  color: var(--text-accent);
+}
+
+.hero-value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: 2px 0 6px;
+  white-space: nowrap;
+}
+.hero-value__num {
+  font: 600 40.134px/normal var(--font-head);
+  color: #000;
+}
+.hero-value__of {
+  font: 500 21.023px/normal var(--font-head);
+  color: #5a5a5a;
+}
+
+.hero-bar {
+  height: 7.8px;
+  border-radius: 14.122px;
+  background: var(--border-strong);
+  position: relative;
+  overflow: hidden;
+}
+.hero-bar span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 14.122px;
+  background: var(--accent);
+}
+
+.hero-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font: 500 11.467px/normal var(--font-head);
+  color: #5a5a5a;
+}
+
+.hero-sub {
+  color: var(--text-2);
+  margin: 10px 0 16px;
+  max-width: 340px;
+}
+
+.hero-empty-goals {
+  flex: 1 1 auto;
+  background: #f7f8fa;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* ---------- Calendar ---------- */
+.cal-card {
+  flex-direction: row;
+  gap: 36px;
+  padding: 34px 28px 40px;
+}
+
+.cal-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cal-nav {
+  display: flex;
+  gap: 30px;
+}
+
+.cal-nav button {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cal-nav button:hover {
+  border-color: var(--accent);
+  background: #f7f8fa;
+}
+
+.cal-weekdays,
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  column-gap: 3px;
+}
+
+.cal-weekdays p {
+  text-align: center;
+  color: #000;
+}
+
+.cal-grid {
+  row-gap: 6px;
+}
+
+.cal-day {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  height: 80px;
+  border-radius: 4px;
+  border: 1px solid var(--border-strong);
+  background: var(--card);
+  padding: 8px 11px;
+  text-align: left;
+  color: #000;
+  transition: border-color 100ms ease, background-color 100ms ease;
+}
+.cal-day.has-items {
+  background: #f7f6ff;
+}
+.cal-day:hover {
+  background: #f7f8fa;
+  border-color: var(--accent);
+  color: var(--text-1);
+}
+/* Figma "Property 1=Selected": lavender fill, accent border and number */
+.cal-day.is-selected,
+.cal-day.is-selected:hover {
+  background: #f7f6ff;
+  border-color: var(--accent);
+  color: var(--text-accent);
+}
+.cal-day.is-other {
+  border-color: transparent;
+  background: rgba(139, 129, 176, 0.25);
+  color: rgba(69, 64, 88, 0.4);
+}
+.cal-day.is-other:hover {
+  background: rgba(139, 129, 176, 0.35);
+  border-color: transparent;
+}
+
+.cal-day.is-today .cal-day__num {
+  color: var(--text-accent);
+  font-weight: 600;
+}
+
+.cal-dots {
+  position: absolute;
+  left: 11px;
+  bottom: 10px;
+  display: flex;
+  gap: 4px;
+}
+.cal-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.cal-side {
+  width: 520px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.legend {
+  display: flex;
+  gap: 21px;
+  padding-top: 11px;
+}
+
+.legend-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-1);
+  white-space: nowrap;
+}
+.legend-tag:hover {
+  color: var(--accent);
+}
+.legend-tag.is-off {
+  opacity: 0.35;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.cal-list {
+  flex: 1 1 auto;
+  max-height: 560px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 4px;
+}
+
+.day-card {
+  border: 0.851px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--card);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+  width: 100%;
+  transition: border-color 100ms ease, background-color 100ms ease, color 100ms ease;
+}
+.day-card:hover,
+.day-card.is-selected {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+/* Figma selected day card (Variant3): accent tint fill, accent text */
+.day-card.is-selected {
+  background: var(--accent-tint);
+}
+.day-card.is-selected .day-card__item,
+.day-card.is-selected .day-card__none {
+  color: var(--text-accent);
+}
+
+/* Figma "Selection status": "N days selected" + "✕  Clear" */
+.sel-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--accent-tint);
+  margin-top: -12px;
+}
+.sel-status .clear-selection {
+  color: var(--text-accent);
+}
+.sel-status .clear-selection:hover {
+  color: var(--text-1);
+}
+.day-card:hover .day-card__item,
+.day-card.is-selected .day-card__item,
+.day-card:hover .t-body-bold,
+.day-card.is-selected .t-body-bold {
+  color: var(--accent);
+}
+
+.t-body-bold {
+  font: 600 16px/1.4 var(--font-body);
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+}
+
+.day-card__items {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.day-card__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-1);
+  text-align: left;
+}
+.day-card__item:hover {
+  text-decoration: underline;
+}
+.day-card__item .legend-dot {
+  flex-shrink: 0;
+}
+
+.cal-empty {
+  flex: 1 1 auto;
+  min-height: 300px;
+}
+
+/* ---------- Plan lists (milestones / touchpoints) ---------- */
+.plan-list {
+  height: 460px;
+  overflow-y: auto;
+  padding-right: 7px;
+  margin-right: -7px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.milestone-row--plan .date-tile {
+  border: 0;
+}
+.milestone-row--plan .date-tile .t-overview-header {
+  font-size: 11px;
+}
+.milestone-row--plan .date-tile .t-h4 {
+  font-weight: 600;
+}
+
+.expand-head {
+  background: #f7f8fa !important;
+  border-color: var(--border-strong) !important;
+  border-radius: 8px 8px 0 0 !important;
+}
+.expand-head .milestone-row__body .t-body,
+.expand-head .tp-row__text .t-body {
+  color: var(--text-accent);
+}
+.expand-head .milestone-row__body .t-body-2 {
+  color: var(--text-1);
+}
+
+.expand-body {
+  border: 1px solid var(--border-strong);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  padding: 0 23px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.expand-label {
+  font: 700 14px/1.4 var(--font-body);
+  letter-spacing: -0.01em;
+  color: #2f2f2f;
+  padding-top: 21px;
+}
+
+.expand-goals {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.expand-goal {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.expand-goal__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.expand-goal__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  color: #090909;
+}
+
+.expand-goal__value {
+  font: 400 13px/1.4 var(--font-head);
+  letter-spacing: -0.01em;
+}
+
+.expand-bar {
+  height: 6.652px;
+  border-radius: 14.122px;
+  background: #cdd2d9;
+  position: relative;
+  overflow: hidden;
+}
+.expand-bar span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 14.122px;
+  background: var(--accent);
+}
+
+.expand-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.edit-ms-small {
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--card);
+  padding: 0 14px;
+  gap: 8px;
+  font: 500 14px/normal var(--font-head);
+  color: var(--text-2);
+}
+.edit-ms-small:hover {
+  background: var(--bg);
+}
+
+.tp-expand-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 18px;
+}
+
+.tp-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.plan-empty-list {
+  flex: 1 1 auto;
+}
+
+/* ---------- Funds & events ---------- */
+.opp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--card-gap);
+}
+
+.opp-card {
+  position: relative;
+  height: 194px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 7.546px;
+  box-shadow: var(--shadow-card);
+  padding: 15px 19px 14px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+.opp-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 1px 2px rgba(20, 24, 31, 0.06), 0 10px 22px rgba(20, 24, 31, 0.09);
+  transform: translateY(-1px);
+}
+
+.opp-pill {
+  align-self: flex-start;
+  border-radius: 4px;
+  padding: 3px 9px;
+  font: 500 11.319px/normal var(--font-head);
+}
+.opp-pill--soon,
+.opp-pill--past {
+  background: var(--negative-tint);
+  color: var(--negative);
+}
+.opp-pill--near {
+  background: var(--warning-tint);
+  color: var(--warning);
+}
+.opp-pill--later {
+  background: var(--border);
+  color: var(--text-2);
+}
+
+.opp-head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.opp-head .date-tile {
+  width: 54px;
+  height: 54px;
+}
+
+.opp-org {
+  font: 600 11.319px/normal var(--font-head);
+  color: #5a5a5a;
+  text-transform: uppercase;
+}
+
+.opp-name {
+  font: 600 14.149px/0.8524 var(--font-head);
+  color: #000;
+  margin-top: 6px;
+  max-width: 150px;
+}
+
+.opp-line {
+  font: 500 11.319px/normal var(--font-head);
+  color: #5a5a5a;
+}
+
+.opp-lines {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.opp-foot {
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  padding-top: 7px;
+  font: 500 11.395px/normal var(--font-head);
+  color: #2a2a2a;
+}
+
+.bookmark-toggle {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bookmark-toggle .bm-hover {
+  display: none;
+}
+.bookmark-toggle:hover .bm-rest {
+  display: none;
+}
+.bookmark-toggle:hover .bm-hover {
+  display: block;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a22;
+  color: #fff;
+  border-radius: 6px;
+  padding: 6px 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.bookmark-toggle:hover .tooltip {
+  opacity: 1;
+}
+
+.find-card {
+  height: 194px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 7.546px;
+  background: var(--card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+}
+.find-card:hover {
+  border-color: var(--accent);
+  background: #fbfbff;
+}
+.find-card--wide {
+  height: 140px;
+  width: 100%;
+}
+
+.find-card__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background: var(--accent-tint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.find-card__title {
+  font: 600 14.149px/normal var(--font-head);
+  color: #000;
+}
+
+/* ---------- Fund / event details dialog ---------- */
+.details {
+  border: 1px solid #000;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+  padding: 36px 40px 32px;
+  gap: 22px;
+}
+
+.details-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 42px;
+}
+
+.details-badge {
+  border-radius: 6px;
+  padding: 6px 12px;
+  font: 500 15px/normal var(--font-body);
+}
+.details-badge--soon,
+.details-badge--past {
+  background: #fdecec;
+  color: #b42318;
+}
+.details-badge--near {
+  background: var(--warning-tint);
+  color: var(--warning);
+}
+.details-badge--later {
+  background: var(--border);
+  color: var(--text-2);
+}
+
+.details-bookmark {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.details-bookmark:hover {
+  background: var(--accent-tint);
+}
+
+.details-title-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.details-date {
+  width: 80px;
+  height: 88px;
+  border-radius: 14px;
+  background: #eeecfb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.details-date__m {
+  font: 600 15px/normal var(--font-body);
+  color: #3b3b48;
+}
+.details-date__d {
+  font: 600 34px/1 var(--font-head);
+  color: #111;
+}
+
+.details-eyebrow {
+  font: 600 13px/normal var(--font-body);
+  letter-spacing: 1.04px;
+  color: #555563;
+  text-transform: uppercase;
+}
+
+.details-title {
+  font: 600 30px/1.18 var(--font-head);
+  color: #111;
+  margin-top: 6px;
+}
+
+.details-divider {
+  height: 1px;
+  background: #e4e4ea;
+}
+
+.details-section-label {
+  font: 600 13px/normal var(--font-body);
+  letter-spacing: 1.04px;
+  color: #4b3fd1;
+}
+
+.details-about {
+  font: 400 16px/1.6 var(--font-body);
+  color: #2a2a33;
+}
+
+.details-table {
+  border: 1px solid #e4e4ea;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.details-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #efeff3;
+}
+.details-row:last-child {
+  border-bottom: 0;
+}
+.details-row__label {
+  width: 108px;
+  font: 400 14px/normal var(--font-body);
+  color: #555563;
+}
+.details-row__value {
+  flex: 1 1 auto;
+  font: 600 15px/normal var(--font-body);
+  color: #111;
+}
+
+.details-foot {
+  border-top: 1px solid #e4e4ea;
+  padding-top: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.see-more {
+  height: 46px;
+  border: 1.5px solid #4b3fd1;
+  border-radius: 12px;
+  padding: 0 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 16px/normal var(--font-body);
+  color: #4b3fd1;
+}
+.see-more:hover {
+  background: var(--accent-tint);
+}
+
+/* ---------- Find funds / events ---------- */
+.find-results {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.find-result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+.find-result:hover {
+  background: var(--bg);
+}
+.find-result__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ======================================================================
+ * Plan hover states (Figma hover variants)
+ * ====================================================================== */
+
+/* Month nav button: 2px border; hover inset bg, accent border + chevron, tooltip */
+.cal-nav button {
+  border: 2px solid var(--border-strong);
+  color: #000;
+}
+.cal-nav button:hover {
+  background: #f7f8fa;
+  border-color: var(--accent);
+  color: var(--text-accent);
+}
+
+/* Other month day: inset bg + accent border, faded number */
+.cal-day.is-other:hover {
+  background: #f7f8fa;
+  border-color: var(--accent);
+  color: #c9ced6;
+}
+
+/* Edit milestone button (Plan header + expanded row) */
+.edit-ms-btn,
+.edit-ms-small {
+  color: var(--text-2);
+}
+.edit-ms-btn .mi,
+.edit-ms-small .mi {
+  color: var(--text-2);
+}
+.edit-ms-btn:hover,
+.edit-ms-small:hover {
+  background: var(--accent-tint);
+  border-color: var(--accent);
+  color: #5b4fe0;
+}
+.edit-ms-btn:hover .mi,
+.edit-ms-small:hover .mi {
+  color: #5b4fe0;
+}
+
+/* Edit touchpoint icon button (expanded touchpoint row) */
+.edit-tp-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--card);
+  color: var(--text-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.edit-tp-btn:hover {
+  background: #eeecfb;
+  border-color: #4b3fd1;
+  color: #4b3fd1;
+}
+
+/* Fund / event card hover */
+.opp-card:hover {
+  background: #f7f8fa;
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-card);
+  transform: none;
+}
+.opp-card:hover .opp-org,
+.opp-card:hover .opp-line {
+  color: var(--text-2);
+}
+.opp-card:hover .opp-foot {
+  color: var(--text-1);
+}
+.opp-card:hover .opp-name {
+  color: var(--text-accent);
+}
+
+/* Find more card hover */
+.find-card:hover {
+  background: var(--accent-tint);
+  border: 1px solid var(--accent);
+}
+.find-card:hover .find-card__title,
+.find-card:hover .opp-line {
+  color: var(--text-accent);
+}
+.find-card:hover .find-card__icon {
+  background: #f7f8fa;
+}
+
+/* Clear selection button: accent → text-1 */
+.clear-selection:hover {
+  color: var(--text-1);
+}
+
+/* "Date link to Calendar" */
+.hero-date:hover {
+  color: var(--text-accent);
+}

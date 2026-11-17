@@ -1,0 +1,335 @@
+/* Settings: Figma "Settings/Account", "Settings/Projects", "OV / Change Username", "OV / Change Email".
+ * Cards, buttons and dialogs reuse the shared app styles. */
+
+.upper {
+  text-transform: uppercase;
+}
+
+/* ---------- Header + tabs (Figma "Settings Menu" / "Menu Button") ---------- */
+.st-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: var(--card-gap);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.st-tabs {
+  align-self: flex-start;
+  display: flex;
+  padding: 4px;
+  border-radius: 20px;
+  background: var(--accent-tint);
+}
+
+.st-tab {
+  padding: 9px 48px;
+  border-radius: 16px;
+  color: var(--text-1);
+  transition: background-color 120ms ease, color 120ms ease;
+}
+.st-tab:hover {
+  background: var(--border-strong);
+  color: #fff;
+}
+.st-tab.is-active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Figma's single 680px column of cards, kept at 1920 (every row matters, so no stretching). */
+.st-columns {
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+  width: 100%;
+  max-width: 680px;
+}
+.st-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+}
+
+/* ---------- Picture / cover + upload ---------- */
+.st-media {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.st-media--cover .game-cover {
+  min-height: 224px;
+}
+
+.st-avatar {
+  border-radius: 50%;
+  background: var(--accent-tint);
+  color: var(--text-accent);
+  font-family: var(--font-body);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.st-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.st-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+/* Figma "Small buttons": 8/12 padding, radius 6 */
+.st-small-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.st-hint {
+  font: 400 14px/1.5 var(--font-head);
+  color: #000;
+}
+
+/* ---------- Rows (Figma "Input Field") ---------- */
+.st-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.st-row-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.st-row {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+.st-row__label {
+  color: #5a5a5a;
+  white-space: nowrap;
+}
+.st-row__value {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0 8px 12px;
+  min-width: 0;
+}
+.st-row--toggle {
+  gap: 24px;
+}
+
+.st-reveal {
+  color: var(--text-2);
+}
+.st-reveal:hover {
+  color: var(--text-accent);
+}
+
+.st-chev {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  transition: background-color 120ms ease, color 120ms ease;
+}
+.st-row--button:hover .st-chev,
+.st-row--button[aria-expanded='true'] .st-chev {
+  background: var(--accent-tint);
+  color: var(--text-accent);
+}
+.st-chev .mi {
+  transition: transform 160ms ease;
+}
+
+.st-list {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 4px;
+}
+.st-person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.st-person__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Figma "Log Out Button": red text, black border → red border on hover */
+.st-logout {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 1px solid #000;
+  border-radius: 6px;
+  color: var(--negative);
+  transition: border-color 120ms ease;
+}
+.st-logout:hover {
+  border-color: var(--negative);
+}
+
+/* ---------- Projects ---------- */
+.st-new {
+  align-self: flex-start;
+  width: auto;
+}
+
+.st-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.st-delete {
+  align-self: flex-start;
+  padding: 7px 11px;
+  border-radius: 6px;
+  gap: 6px;
+}
+
+.st-project {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  transition: border-color 120ms ease;
+}
+.st-project:hover {
+  border-color: var(--border-strong);
+}
+.st-project .game-thumb {
+  display: block;
+  flex-shrink: 0;
+  object-fit: cover;
+  width: 89px;
+  height: 112px;
+  border-radius: 8px;
+}
+.st-people {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.st-avatar--blank {
+  background: #d9d9d9;
+}
+.st-project__text {
+  flex: 1 1 auto;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.st-by {
+  font: 500 11px/1.5 var(--font-head);
+  color: var(--text-1);
+}
+
+.st-empty {
+  min-height: 300px;
+}
+.st-empty .empty-state__icon {
+  color: var(--text-accent);
+}
+
+/* ---------- Dialogs ---------- */
+.input--soft {
+  background: #f8f8f8;
+  border-color: #c8c8c8;
+}
+
+.st-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.st-strong {
+  font: 700 16px/1.4 var(--font-body);
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+}
+
+.st-otp {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Figma "Send OTP": accent → darker on hover → faded while the resend timer runs */
+.st-otp__btn,
+.st-save {
+  font: 500 13px/1.5 var(--font-head);
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  gap: 6px;
+}
+.st-otp__btn:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+.st-otp__btn:disabled {
+  background: #a49ced;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: default;
+}
+
+.st-code {
+  display: flex;
+  gap: 8px;
+}
+.st-code__box {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid #c8c8c8;
+  background: #f8f8f8;
+  text-align: center;
+  color: var(--text-1);
+  outline: none;
+}
+.st-code__box:focus {
+  border: 2px solid var(--accent);
+}
+
+.st-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Figma "Close" in Change Email: soft grey square, no border */
+.close-btn.close-btn--soft {
+  border: 0;
+  background: #f5f5f5;
+  color: #3c3c3c;
+}
+.close-btn.close-btn--soft:hover {
+  background: var(--border);
+}

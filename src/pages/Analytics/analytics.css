@@ -1,0 +1,508 @@
+/* Analytics reuses the Home / Plan building blocks (cards, rows, KPI cards, buttons).
+ * Only layout and the chart live here. */
+
+.upper {
+  text-transform: uppercase;
+}
+
+.analytics {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--card-gap);
+  position: relative;
+}
+
+.an-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+}
+
+.sq {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.an-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.an-title--row {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 12px;
+}
+
+/* ---------- Overview panel: original content, app text sizes ---------- */
+.ov {
+  width: 380px;
+  flex-shrink: 0;
+  position: sticky;
+  top: calc(var(--topbar-h) + var(--page-margin));
+  max-height: calc(100vh - var(--topbar-h) - var(--page-margin) * 2);
+  overflow: hidden;
+}
+
+/* The header stays put; only the sections scroll, with a slim custom scrollbar
+ * that sits inside the card padding instead of cutting through the rounded edge. */
+.ov-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-inner-gap);
+  margin-right: -16px;
+  padding-right: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+  scrollbar-gutter: stable;
+  border-top: 1px solid var(--border);
+}
+.ov-scroll > .ov-section:first-child {
+  border-top: 0;
+}
+.ov-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.ov-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ov-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+.ov-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--text-3);
+}
+
+.ov-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: var(--card-inner-gap);
+  border-top: 1px solid var(--border);
+}
+
+.ov-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.ov-link {
+  color: var(--text-accent);
+}
+.ov-link:hover {
+  color: var(--text-1);
+}
+
+.ov-card {
+  min-height: 68px;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  text-align: left;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+.ov-card:hover {
+  background: #f7f8fa;
+  border-color: var(--border-strong);
+}
+
+.ov-date {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--accent-tint);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-accent);
+  font: 500 11px/1.2 var(--font-head);
+  flex-shrink: 0;
+}
+.ov-date b {
+  font: 600 16px/1.1 var(--font-head);
+}
+
+.ov-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--accent-tint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ov-card__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ov-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ov-placeholder {
+  height: 56px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text-2);
+  font: 300 28px/1 var(--font-head);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ov-placeholder:hover {
+  background: #f7f8fa;
+  border-color: var(--border-strong);
+  color: var(--text-1);
+}
+
+/* Closed overview: round button to reopen (Figma "Arrow Overview") */
+.ov-open {
+  position: fixed;
+  left: calc(var(--sidebar-w) + var(--page-margin) - 8px);
+  top: 50%;
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background: var(--card);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-1);
+}
+.ov-open:hover {
+  background: #f7f8fa;
+  color: var(--text-accent);
+}
+.analytics.is-closed {
+  padding-left: calc(var(--page-margin) + 48px);
+}
+
+/* ---------- Legend: beside the date range in the Insights header ---------- */
+.an-subrow {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.legend.an-legend {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  gap: 20px;
+  /* The Plan calendar legend adds 11px on top; here it sits on the date's line. */
+  padding-top: 0;
+  padding-left: 24px;
+  border-left: 1px solid var(--border);
+}
+.an-legend .legend-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-1);
+}
+.an-legend .legend-dot {
+  width: 12px;
+  height: 12px;
+}
+
+.an-range-menu {
+  left: auto;
+  right: 0;
+  width: 220px;
+}
+
+/* ---------- Graph ---------- */
+.graph {
+  display: flex;
+  gap: 16px;
+  padding: 12px 8px 0 0;
+}
+
+.graph__y {
+  height: 304px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 4px;
+}
+.graph__y span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1;
+}
+.graph__y i {
+  width: 14px;
+  height: 1px;
+  background: var(--border-strong);
+}
+
+.graph__plot {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.graph__cols {
+  height: 304px;
+  display: grid;
+  column-gap: 4px;
+  align-items: end;
+}
+
+.graph__col {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Smaller squares so the whole chart is shorter (16 squares = 304px). */
+.graph__sq {
+  width: min(16px, 100%);
+  height: 16px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.graph__col.is-hover .graph__sq {
+  filter: brightness(0.94);
+}
+
+.scrubber {
+  position: absolute;
+  top: -10px;
+  bottom: -6px;
+  left: 50%;
+  border-left: 1px dashed var(--text-1);
+  pointer-events: none;
+}
+.scrubber__dot {
+  position: absolute;
+  left: calc(50% - 5px);
+  bottom: -16px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1.5px solid var(--text-2);
+  pointer-events: none;
+}
+
+/* Tooltip uses the Home Conversion Points tooltip (.funnel-tip) */
+.graph-tip {
+  left: calc(50% + 14px);
+  top: 20px;
+  width: 260px;
+  pointer-events: none;
+}
+.graph-tip--left {
+  left: auto;
+  right: calc(50% + 14px);
+}
+
+.graph__x {
+  display: grid;
+  column-gap: 4px;
+  margin-top: 18px;
+}
+
+.graph__tick {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  overflow: visible;
+}
+.graph__tick i {
+  width: 1px;
+  height: 14px;
+  background: var(--border-strong);
+}
+.graph__tick span {
+  white-space: nowrap;
+}
+
+/* ---------- Metric cards: Home KPI card, flexible width ---------- */
+.m-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(228px, 1fr));
+  gap: 16px;
+}
+.m-grid--key {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.kpi-card.m-card {
+  width: auto;
+  height: auto;
+  min-height: 168px;
+  cursor: default;
+}
+
+.m-card__swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.m-card__name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.m-card__foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.m-card__rate {
+  background: var(--bg);
+  color: var(--text-2);
+}
+
+.kpi-card.m-card.is-filtered {
+  background: #f7f8fa;
+  border-color: var(--border-strong);
+}
+.kpi-card.m-card.is-filtered .kpi-card__number,
+.kpi-card.m-card.is-filtered .t-body,
+.kpi-card.m-card.is-filtered .m-card__name {
+  color: var(--text-3);
+}
+
+/* ---------- Collapsible sections ---------- */
+.an-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* Original Figma "Metric Arrow Icon": plain chevron, grey → accent on hover */
+.an-section__head .an-arrow {
+  color: var(--text-2);
+}
+.an-section__head:hover .an-arrow {
+  color: var(--text-accent);
+}
+
+.an-arrow {
+  transition: transform 160ms ease;
+}
+.an-arrow.is-open {
+  transform: rotate(180deg);
+}
+
+/* ---------- Dark touchpoint square: hover shows the touchpoint (Figma "Touchpoint" Active) ---------- */
+.graph__col.is-tp,
+.graph__col.is-hover {
+  z-index: 5;
+}
+.graph__sq--tp {
+  position: relative;
+  cursor: pointer;
+  transition: box-shadow 120ms ease;
+}
+.graph__sq--tp.is-active {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--text-1);
+}
+
+.tp-card {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 6;
+  width: 320px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(20, 24, 31, 0.14);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  cursor: default;
+}
+/* Invisible bridge so the pointer can move from the square onto the card */
+.tp-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -14px;
+  width: 14px;
+}
+.tp-card--left {
+  left: auto;
+  right: calc(100% + 12px);
+}
+.tp-card--left::before {
+  left: auto;
+  right: -14px;
+}
+.tp-card__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  text-align: left;
+}
+.tp-card__row:hover {
+  background: #f7f8fa;
+}
+.tp-card__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  background: var(--accent-tint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tp-card__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}

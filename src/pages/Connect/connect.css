@@ -1,0 +1,377 @@
+/* Connect: Figma "Connect Hub", "OV / Edit …", "OV / SSO …", "OV / Disconnect …".
+ * Cards, buttons, dialogs and menus reuse the shared app styles. */
+
+/* ---------- Type filter ("All types" dropdown) ---------- */
+.type-btn.is-active {
+  background: var(--accent-tint);
+  border-color: var(--accent);
+  color: var(--text-accent);
+}
+.type-menu {
+  left: auto;
+  right: 0;
+  width: 240px;
+}
+
+/* ---------- App cards ---------- */
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+  gap: 16px;
+}
+
+.app-card {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: border-color 120ms ease;
+}
+.app-card:hover {
+  border-color: var(--border-strong);
+}
+
+.app-card__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-card__logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.app-card__id {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-card__name {
+  font: 700 14px/1.5 var(--font-head);
+  color: #000;
+}
+
+.app-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 400 11px/1.5 var(--font-head);
+  color: #5a5a5a;
+  min-width: 0;
+}
+
+.app-card__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--positive);
+  flex-shrink: 0;
+}
+
+.app-card__failed {
+  color: var(--negative);
+}
+
+.app-card__desc {
+  font: 400 14px/1.5 var(--font-head);
+  color: #000;
+}
+
+.app-card__connect {
+  gap: 8px;
+}
+
+.connect-empty {
+  min-height: 238px;
+}
+.connect-empty .empty-state__icon {
+  color: var(--text-accent);
+}
+
+/* ---------- Edit overlay ---------- */
+.cx-dialog .input {
+  border-color: var(--border-strong);
+}
+.cx-dialog .input.is-open {
+  border-color: var(--accent);
+}
+.cx-dialog .input.is-error {
+  border-color: var(--negative);
+}
+
+.cx-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.cx-header__text {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cx-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cx-section--tight {
+  gap: 8px;
+}
+
+.cx-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.cx-label {
+  font: 700 16px/1.4 var(--font-body);
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+}
+.cx-label .req {
+  color: var(--negative);
+}
+
+.cx-subject {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.cx-subject__text {
+  max-width: 380px;
+}
+
+.cx-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.picker-value {
+  min-width: 0;
+}
+
+.cx-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cx-disconnect {
+  padding: 8px 12px;
+  border-radius: 6px;
+  gap: 6px;
+}
+
+/* Figma "Channel Picker" + "Channel Select" */
+.picker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 20;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 24px 24px rgba(20, 24, 31, 0.18);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.picker__search {
+  flex: 0 0 auto;
+  margin-bottom: 6px;
+}
+.picker__heading {
+  padding: 2px 0 4px;
+}
+.picker__option {
+  min-height: 36px;
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  color: var(--text-1);
+  background: var(--card);
+}
+.picker__option:hover {
+  background: #cfd3da;
+}
+.picker__option.is-selected {
+  background: var(--accent-tint);
+}
+.picker__option.is-selected:hover {
+  background: #cfd3da;
+}
+.picker__none {
+  padding: 6px 10px;
+}
+
+/* Red minus used by Disconnect and the remove confirm */
+.minus-mark {
+  width: 11px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: var(--negative);
+  display: inline-block;
+}
+.minus-mark--sm {
+  margin: 0 2px;
+}
+.cx-disconnect:hover .minus-mark {
+  background: var(--negative);
+}
+
+/* ---------- Mock sign-in window ---------- */
+.dialog.sso {
+  padding: 0;
+  gap: 0;
+  border-radius: 0;
+  border-color: #e3e3e4;
+  font-family: Roboto, 'Segoe UI', Arial, sans-serif;
+}
+
+.sso__bar {
+  height: 31px;
+  background: #2b2b2b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  color: #fff;
+  font-size: 12px;
+}
+.sso__favicon {
+  border-radius: 50%;
+}
+.sso__title {
+  flex: 1 1 auto;
+  padding-left: 4px;
+}
+.sso__controls {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  margin-right: 30px;
+}
+.sso__min {
+  width: 10px;
+  height: 2px;
+  background: #808080;
+}
+.sso__max {
+  width: 10px;
+  height: 10px;
+  border: 1px solid #808080;
+}
+.sso__x {
+  color: #a0a0a0;
+  font-size: 13px;
+  width: 24px;
+  height: 24px;
+}
+.sso__x:hover {
+  color: #fff;
+}
+
+.sso__url {
+  height: 35px;
+  background: #282828;
+  border-top: 1px solid #444746;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 6px;
+  color: #fff;
+  font-size: 14px;
+  overflow: hidden;
+}
+.sso__avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #383b43;
+  flex-shrink: 0;
+}
+
+.sso__body {
+  height: 657px;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  padding-top: 80px;
+}
+.sso__panel {
+  width: 500px;
+  height: 577px;
+  border: 1px solid #e3e3e4;
+  border-bottom: 0;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.sso__heading {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 28px;
+  color: #000;
+  text-align: center;
+}
+.sso__foot {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.sso__legal {
+  font-size: 14px;
+  line-height: 16px;
+  color: #414141;
+}
+.sso__actions {
+  display: flex;
+  gap: 18px;
+}
+.sso__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 24px;
+  flex: 1 1 0;
+}
+.sso__btn--cancel {
+  border: 1px solid #e3e3e4;
+  color: #414141;
+  flex-basis: 231px;
+}
+.sso__btn--cancel:hover {
+  background: #f4f4f5;
+}
+.sso__btn--connect {
+  background: #2a79ff;
+  color: #fff;
+  flex-basis: 213px;
+}
+.sso__btn--connect:hover {
+  background: #1f68e0;
+}

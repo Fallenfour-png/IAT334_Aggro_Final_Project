@@ -1,0 +1,349 @@
+import type { Account, AppState, Connection, ConnectionId, EventItem, Fund, Kpi, Project, Workspace } from './types';
+
+export const NOTIFY_DEFAULTS: Record<string, boolean> = { goals: true, milestones: true, touchpoints: true, connections: true, weekly: false };
+
+export function demoAccount(): Account {
+  return { username: 'Maya Character', email: 'mayacharacter@sample.com', phone: '604-999-1234', verified: 'Jul 30, 2026 at 3:54 AM', notify: { ...NOTIFY_DEFAULTS } };
+}
+
+const ALL_CONNECTIONS: ConnectionId[] = ['steam', 'discord', 'patreon', 'youtube', 'tiktok', 'instagram', 'itch', 'newsletter'];
+
+/** Figma Home (3596:54257) KPI order. "Touchpoints Live" is kept for Analytics but not shown on Home. */
+export const DEMO_KPIS: Kpi[] = [
+  { id: 'steam', label: 'Steam Wishlists', icon: 'kpi-heart', source: 'steam', value: 12480, delta7: 842, updated: '4h', spark: 'spark-up-1' },
+  { id: 'discord', label: 'Discord Members', icon: 'kpi-users', source: 'discord', value: 3214, delta7: 127, updated: '1h', spark: 'spark-up-2' },
+  { id: 'patreon', label: 'Patreon Patrons', icon: 'kpi-crown', source: 'patreon', value: 186, delta7: 9, updated: '30m', spark: 'spark-up-3' },
+  { id: 'press', label: 'Press Mentions', icon: 'kpi-news', source: 'press', value: 37, delta7: 4, updated: '20m', spark: 'spark-up-4' },
+  { id: 'youtube', label: 'YouTube Subs', icon: 'kpi-youtube', source: 'youtube', value: 1942, delta7: 88, updated: '2h', spark: 'spark-up-1' },
+  { id: 'youtube-views', label: 'YouTube Views', icon: 'kpi-youtube', source: 'youtube', value: 24600, delta7: 9400, updated: '2h', spark: 'spark-up-2', compact: true },
+  { id: 'tiktok', label: 'TikTok Followers', icon: 'kpi-tiktok', source: 'tiktok', value: 8730, delta7: 1204, updated: '1h', spark: 'spark-up-1' },
+  { id: 'tiktok-views', label: 'TikTok Views', icon: 'kpi-tiktok', source: 'tiktok', value: 186000, delta7: 48200, updated: '1h', spark: 'spark-up-3', compact: true },
+  { id: 'ig-followers', label: 'IG Followers', icon: 'kpi-instagram', source: 'instagram', value: 2318, delta7: 142, updated: '3h', spark: 'spark-up-4' },
+  { id: 'ig-views', label: 'IG Views', icon: 'kpi-instagram', source: 'instagram', value: 61500, delta7: 41000, updated: '3h', spark: 'spark-up-2', compact: true },
+  { id: 'newsletter', label: 'Newsletter Subs', icon: 'kpi-newsletter', source: 'newsletter', value: 412, delta7: 31, updated: '1d', spark: 'spark-up-1' },
+  { id: 'touchpoints', label: 'Touchpoints Live', icon: 'kpi-broadcast', source: 'touchpoints', value: 24, delta7: 0, note: '6 scheduled next 14d', updated: '10m', spark: 'spark-wave' },
+];
+
+function connections(connected: ConnectionId[]): Connection[] {
+  return ALL_CONNECTIONS.map((id) => ({ id, connected: connected.includes(id) }));
+}
+
+const EVENTS: EventItem[] = [
+  {
+    id: 'steam-next-fest',
+    name: 'Steam Next Fest',
+    where: 'Online',
+    when: 'Demo submissions due Aug 12',
+    start: '2026-08-12',
+    end: '2026-08-19',
+    kind: 'Online',
+    line1: 'Demo Festival',
+    audience: 'Players & Press',
+    about: 'An online demo festival on Steam where players and press try free demos of upcoming games.',
+    saved: true,
+    listed: true,
+  },
+  {
+    id: 'pax-west',
+    name: 'PAX West',
+    where: 'Seattle',
+    when: 'Aug 29 to Sep 1',
+    start: '2026-08-29',
+    end: '2026-09-01',
+    kind: 'Seattle',
+    line1: 'Booth 2184',
+    audience: 'Players & Press',
+    about: 'PAX West in Seattle is a gaming expo where you show your game to players and press. Your setup is at booth 2184.',
+    saved: true,
+    listed: true,
+  },
+  {
+    id: 'vancouver-indie',
+    name: 'Vancouver Indie Showcase',
+    where: 'Vancouver',
+    when: 'Sep 18',
+    start: '2026-09-18',
+    kind: 'Vancouver',
+    line1: 'Demo unreleased games',
+    audience: 'Developers & Funders',
+    about: 'A Vancouver showcase for demoing unreleased games to other developers and funders.',
+    saved: true,
+    listed: true,
+  },
+  {
+    id: 'day-of-the-devs',
+    name: 'Day of the Devs',
+    where: 'Online',
+    when: 'Submissions close Sep 5',
+    start: '2026-09-05',
+    kind: 'Online',
+    line1: 'Curated showcase',
+    audience: 'Players & Press',
+    about: 'A curated online showcase of upcoming indie games. Submissions close Sep 5.',
+    saved: false,
+    listed: false,
+    recommended: true,
+  },
+  {
+    id: 'indie-game-festival',
+    name: 'Indie Game Festival',
+    where: 'Online',
+    when: 'Oct 2',
+    start: '2026-10-02',
+    kind: 'Online',
+    line1: 'Festival & awards',
+    audience: 'Players & Press',
+    about: 'An online festival celebrating independent games, with awards and a public demo day.',
+    saved: false,
+    listed: false,
+    recommended: true,
+  },
+];
+
+const FUNDS: Fund[] = [
+  {
+    id: 'early-stage-growth',
+    org: 'DIGIBC',
+    name: 'Early stage growth program',
+    title: 'Early Stage Growth',
+    deadline: '2026-08-12',
+    amount: 'Up to $5,000 per project',
+    line2: 'Fund for early stage studios',
+    who: 'Early stage studios in B.C.',
+    about:
+      'The Early Stage Growth Program helps early stage studios in B.C. take a project to its next milestone. Studios can put the funding toward a playable demo, a vertical slice, or getting a build ready for showcases and festivals.',
+    saved: true,
+    listed: true,
+  },
+  {
+    id: 'interactive-digital-media',
+    org: 'Creative BC',
+    name: 'Interactive digital media program',
+    title: 'Interactive Digital Media Program',
+    deadline: '2026-08-20',
+    amount: 'Provincial fund for B.C. studios',
+    line2: 'Fund for early stage studios',
+    who: 'Early stage studios in B.C.',
+    about: 'A provincial fund from Creative BC for B.C. studios building interactive digital media projects, including games.',
+    saved: true,
+    listed: true,
+  },
+  {
+    id: 'project-development',
+    org: 'DIGIBC',
+    name: 'Project Development Fund',
+    title: 'Project Development Fund',
+    deadline: '2026-09-20',
+    amount: 'Up to $5,000 per project',
+    line2: 'Fund for early stage studios',
+    who: 'Early stage studios in B.C.',
+    about: 'Helps early stage studios in B.C. develop a game project, with up to $5,000 available per project.',
+    saved: false,
+    listed: true,
+  },
+  {
+    id: 'cmf-experimental',
+    org: 'Canada Media Fund',
+    name: 'Experimental stream',
+    title: 'CMF Experimental Stream',
+    deadline: '2026-10-15',
+    amount: 'Up to $250,000 per project',
+    line2: 'Fund for innovative games',
+    who: 'Canadian studios',
+    about: 'Supports innovative interactive projects from Canadian studios, from prototype through production.',
+    saved: false,
+    listed: false,
+  },
+  {
+    id: 'indie-micro-grant',
+    org: 'Indie Fund',
+    name: 'Indie micro-grant',
+    title: 'Indie Micro-Grant',
+    deadline: '2026-11-01',
+    amount: 'Up to $2,500 per project',
+    line2: 'Fund for solo developers',
+    who: 'Solo and two-person teams',
+    about: 'Small, fast grants for solo developers and tiny teams finishing a demo or vertical slice.',
+    saved: false,
+    listed: false,
+  },
+];
+
+const HOLLOW_SIGNAL: Project = {
+  name: 'Hollow Signal',
+  tagline: 'The demo drop campaign  ·  TikTok, Discord, Steam & Patreon',
+  tags: ['Active Push', 'Pre-Launch • Steam Next Fest'],
+  campaignStart: '2026-07-01',
+  launch: '2026-10-14',
+  coverTop: 'HOLLOW',
+  coverBottom: 'SIGNAL',
+};
+
+export function demoState(): AppState {
+  return {
+    version: 2,
+    seed: 'demo',
+    project: { ...HOLLOW_SIGNAL },
+    account: demoAccount(),
+    goals: [
+      { id: 'g-discord', title: 'Grow Discord to 5,000 members', type: 'Discord members', current: 3214, target: 5000, due: '2026-09-01' },
+      { id: 'g-press', title: 'Secure 3 press features before PAX West', type: 'Press features', current: 1, target: 3, due: '2026-08-29' },
+      { id: 'g-shorts', title: 'Publish 12 short-form videos / month', type: 'Short-form videos', current: 12, target: 12, due: '2026-08-31', completedAt: '2026-08-04' },
+      { id: 'g-newsletter', title: 'Reach 500 newsletter subscribers', type: 'Newsletter subscribers', current: 412, target: 500, due: '2026-10-01' },
+      { id: 'g-steam', title: 'Reach 25,000 Steam wishlists by launch', type: 'Steam wishlists', current: 12480, target: 25000, due: '2026-10-14' },
+      { id: 'g-patreon', title: 'Reach 250 Patreon patrons', type: 'Patreon members', current: 186, target: 250, due: '2026-10-20' },
+      { id: 'g-playtests', title: 'Run 3 community playtest sessions', type: 'Custom', current: 1, target: 3, due: '2026-10-24' },
+      { id: 'g-tiktok', title: 'Hit 10,000 TikTok followers', type: 'Custom', current: 8730, target: 10000, due: '2026-10-28' },
+      { id: 'g-podcasts', title: 'Book 2 podcast interviews', type: 'Press features', current: 0, target: 2, due: '2026-11-02' },
+    ],
+    milestones: [
+      {
+        id: 'm-nextfest',
+        title: 'Steam Next Fest demo submission',
+        type: 'Deliverable',
+        channel: 'Event',
+        date: '2026-08-12',
+        eventId: 'steam-next-fest',
+        goals: [
+          { metric: 'Steam wishlists', target: 15000 },
+          { metric: 'Discord members', target: 4000 },
+          { metric: 'Patreon members', target: 250 },
+        ],
+      },
+      { id: 'm-devlog', title: 'Devlog #14 — combat overhaul reveal', type: 'Content', channel: 'YouTube + TikTok', date: '2026-08-20', goals: [] },
+      { id: 'm-pax', title: 'PAX West — booth 2184 setup', type: 'Event', channel: 'Showcase', date: '2026-08-29', eventId: 'pax-west', goals: [] },
+      { id: 'm-ign', title: 'Press embargo lifts — IGN preview', type: 'Press', channel: 'Article', date: '2026-09-10', goals: [] },
+      { id: 'm-patreon', title: 'Patreon early access tier opens', type: 'Revenue', channel: 'Patreon', date: '2026-09-24', goals: [] },
+      { id: 'm-igf', title: 'Indie Game Festival showcase', type: 'Event', channel: 'Online', date: '2026-10-02', eventId: 'indie-game-festival', goals: [] },
+      { id: 'm-launch', title: 'Launch day — Steam release', type: 'Deliverable', channel: 'Steam', date: '2026-10-14', goals: [] },
+      { id: 'm-update', title: 'First post-launch patch notes', type: 'Content', channel: 'Steam + Discord', date: '2026-10-28', goals: [] },
+    ],
+    touchpoints: [
+      {
+        id: 't-tiktok',
+        kind: 'Short-form',
+        platform: 'TikTok',
+        title: '"When your save file corrupts"',
+        stats: '48.2K views  •  3.1K likes  •  +84 wishlists attributed',
+        date: '2026-08-06',
+        hoursAgo: 2,
+        thumb: 'video',
+        wishlists: 84,
+      },
+      {
+        id: 't-instagram',
+        kind: 'Short-form',
+        platform: 'Instagram',
+        title: '"Demo Teaser"',
+        stats: '$120 spent  •  41K reach  •  +67 wishlists',
+        date: '2026-08-05',
+        thumb: 'megaphone',
+        wishlists: 67,
+      },
+      {
+        id: 't-press',
+        kind: 'Press',
+        platform: 'Indie Games Plus',
+        title: 'Feature: "5 solo dev horror games to watch out for in 2025"',
+        stats: '~12K article reads  •  +221 wishlists attributed',
+        date: '2026-08-05',
+        thumb: 'press',
+        wishlists: 221,
+      },
+      {
+        id: 't-storefront',
+        kind: 'Storefront',
+        platform: 'Steam',
+        title: 'Updated screenshots + short trailer',
+        stats: 'Visits  →  Wishlist rate +2.3% (14.1%)',
+        date: '2026-08-04',
+        thumb: 'storefront',
+        wishlists: 0,
+      },
+      {
+        id: 't-devlog',
+        kind: 'Devlog',
+        platform: 'YouTube',
+        title: 'Devlog #13: building the corruption effect',
+        stats: '9.4K views  •  610 likes  •  +58 wishlists attributed',
+        date: '2026-08-01',
+        thumb: 'megaphone',
+        wishlists: 58,
+      },
+      {
+        id: 't-discord',
+        kind: 'Community',
+        platform: 'Discord',
+        title: 'Playtest sign-ups opened in #announcements',
+        stats: '312 reactions  •  +46 members joined',
+        date: '2026-07-30',
+        thumb: 'community',
+        wishlists: 0,
+      },
+    ],
+    connections: connections(['steam', 'discord', 'patreon', 'youtube', 'tiktok', 'instagram', 'newsletter']),
+    kpis: DEMO_KPIS,
+    events: EVENTS,
+    funds: FUNDS,
+    notifications: [
+      { id: 'n1', title: '“When your save file corrupts” passed 48K views', meta: '+84 wishlists attributed  •  2h ago', icon: 'Shorts', unread: true },
+      { id: 'n2', title: 'Steam Next Fest demo submission is due in 6 days', meta: 'Milestone  •  Aug 12', icon: 'Event', unread: true },
+      { id: 'n3', title: 'Secure 3 press features is Behind', meta: 'Goal  •  1 of 3 secured  •  1d ago', icon: 'News', unread: true },
+      { id: 'n4', title: 'Steam wishlist rate up 2.3% after the screenshot update', meta: 'Storefront  •  2d ago', icon: 'Storefront', unread: false },
+    ],
+    range: 'Last 7 days',
+    due: 'Next 3 months',
+    otherGames: [fraserWorkspace()],
+  };
+}
+
+/** Figma "Other Projects" → Project Fraser: a second, lightly set-up game. */
+function fraserWorkspace(): Workspace {
+  const fresh = freshState();
+  return {
+    ...fresh,
+    seed: 'fresh',
+    project: {
+      name: 'Project Fraser',
+      tagline: 'Early prototype  ·  Discord & Steam',
+      tags: ['Pre-Production'],
+      campaignStart: '2026-07-20',
+      launch: '2027-03-12',
+      coverTop: 'PROJECT',
+      coverBottom: 'FRASER',
+      coverGradient: ['#c8102e', '#a01427'],
+      setupDone: true,
+    },
+    goals: [
+      { id: 'f-g1', title: 'Reach 2,000 Steam wishlists', type: 'Steam wishlists', current: 0, target: 2000, due: '2026-12-01' },
+      { id: 'f-g2', title: 'Grow Discord to 500 members', type: 'Discord members', current: 0, target: 500, due: '2026-11-15' },
+    ],
+    milestones: [
+      { id: 'f-m1', title: 'Steam page goes live', type: 'Deliverable', channel: 'Steam', date: '2026-09-15', goals: [] },
+      { id: 'f-m2', title: 'First devlog', type: 'Content', channel: 'YouTube', date: '2026-10-01', goals: [] },
+      { id: 'f-m3', title: 'Closed alpha playtest', type: 'Event', channel: 'Discord', date: '2026-11-20', goals: [] },
+    ],
+  };
+}
+
+export function freshState(): AppState {
+  // A brand-new account: the game exists (Figma "empty start"), nothing else does yet.
+  return {
+    version: 2,
+    seed: 'fresh',
+    // The "Welcome, let's get your dashboard ready" checklist shows until the user finishes it.
+    project: { ...HOLLOW_SIGNAL, setupDone: false },
+    // Figma "Setting Empty": no phone number yet, so 2FA reads "Phone Number Needed".
+    account: { ...demoAccount(), phone: undefined, verified: undefined },
+    goals: [],
+    milestones: [],
+    touchpoints: [],
+    connections: connections([]),
+    kpis: DEMO_KPIS.map((k) => ({ ...k, value: 0, delta7: 0, note: undefined })),
+    events: EVENTS.map((e) => ({ ...e, saved: false, listed: false, recommended: true })),
+    funds: FUNDS.map((f) => ({ ...f, saved: false, listed: false })),
+    notifications: [],
+    range: 'Last 7 days',
+    due: 'Next 3 months',
+  };
+}

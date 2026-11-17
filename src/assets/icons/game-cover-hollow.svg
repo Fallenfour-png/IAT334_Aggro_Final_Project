@@ -1,0 +1,20 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="91.2414" height="90.0167" viewBox="0 0 91.2414 90.0167" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Game Cover">
+<g clip-path="url(#clip0_0_63)">
+<rect width="91.2414" height="90.0167" rx="32" fill="url(#paint0_linear_0_63)"/>
+<circle id="Signal ring" cx="77.2429" cy="42.241" r="62.7285" stroke-width="1.26724" stroke="white" stroke-opacity="0.1"/>
+<circle id="Signal ring_2" cx="77.2433" cy="42.2414" r="41.6078" stroke-width="1.26724" stroke="white" stroke-opacity="0.16"/>
+<circle id="Signal ring_3" cx="77.242" cy="42.24" r="22.1767" stroke-width="1.26724" stroke="white" stroke-opacity="0.26"/>
+<circle id="Signal core" cx="77.2447" cy="42.2408" r="5.06897" fill="#A9A2F2"/>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_63" x1="45.6207" y1="0" x2="45.6207" y2="90.0167" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0E0D22"/>
+<stop offset="1" stop-color="#2F2775"/>
+</linearGradient>
+<clipPath id="clip0_0_63">
+<rect width="91.2414" height="90.0167" rx="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
