@@ -41,8 +41,13 @@ function AvatarMenu() {
               navigate('/games');
             }}
           />
-          {/* No destination in the prototype: hover state only. */}
-          <MenuOption label="Log out" />
+          <MenuOption
+            label="Log out"
+            onSelect={() => {
+              close();
+              navigate('/games');
+            }}
+          />
           <div className="menu-divider" />
           <p className="t-banner menu-heading" style={{ padding: '4px 8px 0' }}>
             TESTING

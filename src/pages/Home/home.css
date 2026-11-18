@@ -336,7 +336,8 @@
 
 .carousel-arrow {
   position: absolute;
-  top: 76px;
+  /* Centred on the 164px KPI cards only (not cards + page dots): 164 / 2 - 40 / 2 */
+  top: 62px;
   width: 40px;
   height: 40px;
   border-radius: 20px;
@@ -964,7 +965,17 @@
 /* Figma "Project Header": 20/16 padding, cover | info | side column */
 .project-header {
   padding: 16px 20px;
-  align-items: flex-start;
+  align-items: stretch;
+}
+/* Cover, campaign bar and the header buttons all end on the same bottom line. */
+.project-header .game-cover {
+  align-self: flex-end;
+}
+.project-header .project-info {
+  justify-content: space-between;
+}
+.project-header .header-side {
+  justify-content: space-between;
 }
 /* Figma "Game Cover" in the header: 142x180, 24px title */
 .game-cover--small {

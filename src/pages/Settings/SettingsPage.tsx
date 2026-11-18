@@ -387,6 +387,7 @@ function stamp(): string {
 
 function AccountTab() {
   const { state, update } = useStore();
+  const navigate = useNavigate();
   const account = accountOf(state);
   const [open, setOpen] = useState<Open>(null);
   const [reveal, setReveal] = useState({ email: false, phone: false });
@@ -467,8 +468,8 @@ function AccountTab() {
           </div>
         </section>
 
-        {/* No destination in the prototype: hover state only (like the sidebar Log out). */}
-        <button type="button" className="st-logout t-body">
+        {/* Log out returns to project selection (the Games screen), like the sidebar Log out. */}
+        <button type="button" className="st-logout t-body" onClick={() => navigate('/games')}>
           Log Out
           <Icon name="nav-logout" size={20} tint />
         </button>

@@ -141,16 +141,18 @@
 .bell:hover {
   filter: brightness(0.97);
 }
-/* The Figma bell has a baked-in red dot; hide it when nothing is unread */
-.bell.no-unread::after {
+/* Figma "Unread" dot (r3, 2px white stroke at 25,14), drawn only when something is unread */
+.bell:not(.no-unread)::after {
   content: '';
   position: absolute;
   top: 10px;
-  right: 10px;
-  width: 9px;
-  height: 9px;
+  left: 21px;
+  width: 8px;
+  height: 8px;
+  box-sizing: border-box;
   border-radius: 50%;
-  background: var(--card);
+  border: 2px solid #fff;
+  background: #c8372d;
 }
 
 .avatar {
