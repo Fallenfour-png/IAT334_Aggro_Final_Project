@@ -6,7 +6,7 @@ import { newId, useStore } from '../../state/store';
 import { AUTO_GOAL_SOURCE, GOAL_TYPES, type Goal, type GoalType } from '../../state/types';
 import { DateField, Dialog, FieldLabel, NumberField, SelectField, StackedConfirm, TextField } from '../../components/ui/Dialog';
 
-const SOURCE_NAME = { steam: 'Steamworks', discord: 'Discord', patreon: 'Patreon' } as Record<string, string>;
+const SOURCE_NAME = { steam: 'Steamworks', discord: 'Discord', patreon: 'Patreon', newsletter: 'your newsletter' } as Record<string, string>;
 
 interface Draft {
   title: string;

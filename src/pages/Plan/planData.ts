@@ -1,6 +1,6 @@
 import { daysFromToday, parseDate, TODAY } from '../../lib/dates';
-import { goalCurrent } from '../../state/selectors';
-import type { AppState, GoalType, MilestoneGoal } from '../../state/types';
+import { goalCurrent, goalStatus } from '../../state/selectors';
+import type { AppState, GoalStatus, GoalType, MilestoneGoal } from '../../state/types';
 
 export type CalKind = 'milestone' | 'goal' | 'event' | 'fund';
 
@@ -146,4 +146,14 @@ export function metricCurrent(state: AppState, g: MilestoneGoal): number {
 
 export function nextMilestone(state: AppState) {
   return [...state.milestones].filter((m) => daysFromToday(m.date) >= 0).sort((a, b) => a.date.localeCompare(b.date))[0];
+}
+
+/** Same rules as Home's Goals card (Completed / Behind / On track), using the milestone's target and date. */
+export function milestoneGoalStatus(state: AppState, g: MilestoneGoal, due: string): GoalStatus {
+  return goalStatus(state, { id: 'ms-goal', title: '', type: g.metric, current: metricCurrent(state, g), target: g.target, due });
+}
+
+/** Bar fill modifier matching Home: green when completed, orange when behind, purple otherwise. */
+export function barTone(status: GoalStatus): string {
+  return status === 'Completed' ? 'is-completed' : status === 'Behind' ? 'is-behind' : '';
 }

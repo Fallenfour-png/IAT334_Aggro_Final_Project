@@ -7,11 +7,13 @@ import { useStore } from '../../state/store';
 import type { Milestone } from '../../state/types';
 import {
   CAL_KINDS,
+  barTone,
   calendarItems,
   dayHeading,
   KIND_COLOR,
   longDate,
   METRIC_LABEL,
+  milestoneGoalStatus,
   metricCurrent,
   monthCells,
   MONTHS_LONG,
@@ -78,7 +80,7 @@ export function MilestoneHero({ milestone, onPickDate, onAddMilestone }: { miles
                     <span className="hero-value__of">/ {formatNumber(g.target)}</span>
                   </div>
                   <div className="hero-bar">
-                    <span style={{ width: `${pct}%` }} />
+                    <span className={barTone(milestoneGoalStatus(state, g, milestone.date))} style={{ width: `${pct}%` }} />
                   </div>
                   <div className="hero-foot">
                     <span>{pct}% done</span>

@@ -14,6 +14,7 @@ export const AUTO_GOAL_SOURCE: Partial<Record<GoalType, ConnectionId>> = {
   'Steam wishlists': 'steam',
   'Discord members': 'discord',
   'Patreon members': 'patreon',
+  'Newsletter subscribers': 'newsletter',
 };
 
 export type GoalCategory = 'Wishlists' | 'Community' | 'Press' | 'Content' | 'Revenue';

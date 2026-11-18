@@ -1360,3 +1360,13 @@
   z-index: 1;
   background: var(--card);
 }
+
+/* Goal progress colors follow status, same as Home's Goals card. */
+.hero-bar span.is-completed,
+.expand-bar span.is-completed {
+  background: var(--positive);
+}
+.hero-bar span.is-behind,
+.expand-bar span.is-behind {
+  background: var(--warning);
+}
