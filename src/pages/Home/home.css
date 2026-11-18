@@ -1057,14 +1057,17 @@
   height: 452px;
 }
 .dash-row .card-header {
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 .dash-row .card-header h2 {
+  flex: 1 1 auto;
   min-width: 0;
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .dash-row .card-actions {
-  flex-wrap: wrap;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
   min-width: 0;
-  max-width: 100%;
 }
