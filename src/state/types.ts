@@ -128,6 +128,8 @@ export interface EventItem {
   /** Shown in "Upcoming Events" on Plan. */
   listed: boolean;
   recommended?: boolean;
+  /** Official page opened by "See more". */
+  url?: string;
 }
 
 export interface Fund {
@@ -144,6 +146,8 @@ export interface Fund {
   saved: boolean;
   /** Shown in "Upcoming Funds" on Plan. */
   listed: boolean;
+  /** Official page opened by "See more". */
+  url?: string;
 }
 
 export interface Notification {

@@ -498,6 +498,16 @@
 .square-btn:hover {
   background: var(--bg);
 }
+/* Remove goal: Remix close icon, turns red with white icon on hover */
+.square-btn--remove {
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.square-btn--remove:hover,
+.square-btn--remove:focus-visible {
+  background: var(--negative);
+  border-color: var(--negative);
+  color: #fff;
+}
 .square-btn--add {
   background: var(--accent);
   border-color: var(--accent);

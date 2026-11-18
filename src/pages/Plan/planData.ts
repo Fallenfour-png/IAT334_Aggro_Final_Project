@@ -17,7 +17,20 @@ export interface CalItem {
   date: string;
   kind: CalKind;
   label: string;
+  /** Second line in the day preview, e.g. "Deliverable • Event". */
+  sub: string;
   refId: string;
+}
+
+const MON3 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** "Aug 12–19" / "Aug 29–Sep 1" / "Sep 18" */
+export function shortRange(start: string, end?: string): string {
+  const a = parseDate(start);
+  const head = `${MON3[a.getUTCMonth()]} ${a.getUTCDate()}`;
+  if (!end || end === start) return head;
+  const b = parseDate(end);
+  return a.getUTCMonth() === b.getUTCMonth() ? `${head}–${b.getUTCDate()}` : `${head}–${MON3[b.getUTCMonth()]} ${b.getUTCDate()}`;
 }
 
 const ORDER: Record<CalKind, number> = { milestone: 0, goal: 1, event: 2, fund: 3 };
@@ -29,12 +42,23 @@ function titleCase(s: string): string {
 /** Everything that shows on the Plan calendar, driven by the live data. */
 export function calendarItems(state: AppState): CalItem[] {
   const items: CalItem[] = [
-    ...state.milestones.map((m) => ({ date: m.date, kind: 'milestone' as const, label: m.title, refId: m.id })),
+    ...state.milestones.map((m) => ({ date: m.date, kind: 'milestone' as const, label: m.title, sub: `${m.type}  •  ${m.channel}`, refId: m.id })),
     ...state.goals
       .filter((g) => !g.completedAt)
-      .map((g) => ({ date: g.due, kind: 'goal' as const, label: g.title, refId: g.id })),
-    ...state.events.filter((e) => e.saved).map((e) => ({ date: e.start, kind: 'event' as const, label: `${e.name} Event`, refId: e.id })),
-    ...state.funds.filter((f) => f.saved).map((f) => ({ date: f.deadline, kind: 'fund' as const, label: titleCase(f.name), refId: f.id })),
+      .map((g) => ({
+        date: g.due,
+        kind: 'goal' as const,
+        label: g.title,
+        sub: `${goalCurrent(state, g).toLocaleString('en-US')} / ${g.target.toLocaleString('en-US')}`,
+        refId: g.id,
+      })),
+    ...state.events
+      .filter((e) => e.saved)
+      .map((e) => ({ date: e.start, kind: 'event' as const, label: e.name, sub: `${e.where}  •  ${shortRange(e.start, e.end)}`, refId: e.id })),
+    // Every fund in "Upcoming Funds" shows on the calendar.
+    ...state.funds
+      .filter((f) => f.listed || f.saved)
+      .map((f) => ({ date: f.deadline, kind: 'fund' as const, label: titleCase(f.name), sub: `${f.org}  •  ${dueLabel(f.deadline, 'Due')}`, refId: f.id })),
   ];
   return items.sort((a, b) => a.date.localeCompare(b.date) || ORDER[a.kind] - ORDER[b.kind]);
 }
