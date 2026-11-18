@@ -34,6 +34,13 @@ function AvatarMenu() {
               navigate('/settings');
             }}
           />
+          <MenuOption
+            label="Switch project"
+            onSelect={() => {
+              close();
+              navigate('/games');
+            }}
+          />
           {/* No destination in the prototype: hover state only. */}
           <MenuOption label="Log out" />
           <div className="menu-divider" />

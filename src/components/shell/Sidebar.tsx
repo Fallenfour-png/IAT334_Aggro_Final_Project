@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { iconUrl } from '../../lib/icons';
 import { useStore } from '../../state/store';
 
@@ -21,6 +21,7 @@ function NavIcon({ icon, active }: { icon: string; active?: boolean }) {
 
 export function Sidebar() {
   const { state } = useStore();
+  const navigate = useNavigate();
 
   return (
     <aside className="sidebar">
@@ -36,8 +37,8 @@ export function Sidebar() {
         ))}
       </nav>
       <div className="sidebar-spacer" />
-      {/* Log out has no destination in the prototype: hover state only. */}
-      <button type="button" className="nav-item">
+      {/* Log out returns to project selection (the Games screen). */}
+      <button type="button" className="nav-item" onClick={() => navigate('/games')}>
         <NavIcon icon="nav-logout" />
         <span className="t-sub2">Log out</span>
       </button>
