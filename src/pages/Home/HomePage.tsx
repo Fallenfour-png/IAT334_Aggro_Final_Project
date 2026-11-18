@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '../../components/shell/AppLayout';
 import { useStore } from '../../state/store';
 import type { Goal, Milestone } from '../../state/types';
-import { GoalsCard, MilestonesCard, TouchpointsCard } from './Cards';
+import { ConversionCard, GoalsCard, MilestonesCard, TouchpointsCard } from './Cards';
 import { GoalDialog } from './GoalDialog';
 import { DashboardRange, ProjectHeader } from './HeaderSection';
 import { KpiCarousel } from './KpiCarousel';
@@ -45,14 +45,18 @@ export function HomePage() {
           </>
         ) : (
           <>
-            <ProjectHeader />
+            <ProjectHeader onOpenTouchpoint={(t) => setOpen({ kind: 'touchpoint', id: t.id })} />
+            <DashboardRange />
             <KpiCarousel />
           </>
         )}
-        {/* Figma Home (3596:54257): Goals, Upcoming Milestones and Touchpoint updates side by side. */}
-        <div className="home-columns">
+        {/* Figma Home (3726:60269): Goals | Upcoming Milestones, then Conversion Points | Touchpoint updates. */}
+        <div className="dash-row">
           <GoalsCard onAdd={() => setOpen({ kind: 'goal' })} onOpen={(goal) => setOpen({ kind: 'goal', goal })} />
           <MilestonesCard onAdd={() => setOpen({ kind: 'milestone' })} onOpen={(milestone) => setOpen({ kind: 'milestone', milestone })} />
+        </div>
+        <div className="dash-row">
+          <ConversionCard />
           <TouchpointsCard onAdd={newTouchpoint} onOpen={(t) => setOpen({ kind: 'touchpoint', id: t.id })} />
         </div>
       </main>

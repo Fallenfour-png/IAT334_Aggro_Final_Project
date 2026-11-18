@@ -295,7 +295,6 @@ function MetricCard({ m, filtered }: { m: MetricCardData; filtered?: boolean }) 
       </div>
       <div className="kpi-card__value">
         <span className="t-h2 c-1 kpi-card__number">{m.value}</span>
-        <span className={`status t-sub2 ${m.positive && !filtered ? 'status--completed' : 'm-card__rate'}`}>{m.rate}</span>
       </div>
       <div className="m-card__foot">
         <p className={`t-body nowrap ${m.positive && !filtered ? 'c-positive' : 'c-2'}`}>{m.change}</p>
@@ -308,7 +307,8 @@ function MetricCard({ m, filtered }: { m: MetricCardData; filtered?: boolean }) 
 export function AnalyticsPage() {
   const { state } = useStore();
   const navigate = useNavigate();
-  const [overview, setOverview] = useState(true);
+  // The Overview sidebar starts collapsed; the chevron tab opens it.
+  const [overview, setOverview] = useState(false);
   const [timeframe, setTimeframe] = useState<Timeframe>('Last 7 Days');
   const [hidden, setHidden] = useState<FilterId[]>([]);
   // Key Metrics collapses like the sections below, but starts open.

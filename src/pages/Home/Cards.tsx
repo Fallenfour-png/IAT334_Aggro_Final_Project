@@ -2,18 +2,21 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dayOfMonth, daysFromToday, formatAgo, formatNumber, monthTag } from '../../lib/dates';
 import { Icon } from '../../lib/icons';
-import {
-  DUE_DAYS,
-  goalCurrent,
-  goalMeta,
-  goalPercent,
-  goalSortDate,
-  goalStatus,
-  RANGE_DAYS,
-  funnelOf,
-} from '../../state/selectors';
+import { DUE_DAYS, goalCurrent, goalMeta, goalPercent, goalSortDate, goalStatus, RANGE_DAYS, funnelOf } from '../../state/selectors';
 import { useStore } from '../../state/store';
-import { GOAL_CATEGORY, type Goal, type GoalCategory, type GoalStatus, type Milestone, type MilestoneType, type Touchpoint } from '../../state/types';
+import {
+  DUE_WINDOWS,
+  GOAL_CATEGORY,
+  RANGES,
+  type DueWindow,
+  type Goal,
+  type GoalCategory,
+  type GoalStatus,
+  type Milestone,
+  type MilestoneType,
+  type Range,
+  type Touchpoint,
+} from '../../state/types';
 import { FilterButton, FilterChips, MenuOption, Popover } from '../../components/ui/Menu';
 import { inRange } from './HeaderSection';
 
@@ -55,6 +58,37 @@ function EmptyState({ icon, title, lines, action }: { icon: string; title: strin
 export function NoMatch({ title, lines, onClear }: { title: string; lines: [string, string]; onClear: () => void }) {
   return (
     <EmptyState icon="search-16" title={title} lines={lines} action={<LinkButton label="Clear filter" onClick={onClear} />} />
+  );
+}
+
+/** Card date filter: outline button (calendar + period + chevron), one period per card. */
+function DateFilter<T extends string>({ value, options, onChange }: { value: T; options: readonly T[]; onChange: (v: T) => void }) {
+  return (
+    <Popover
+      menuClassName="menu menu--list filter-menu"
+      menuStyle={{ width: 220 }}
+      trigger={({ open, toggle }) => (
+        <button type="button" className="btn btn--outline date-filter" aria-expanded={open} onClick={toggle}>
+          <Icon name="calendar-16" size={16} tint />
+          <span className="t-btn">{value}</span>
+          <Icon name="filter-chevron" size={18} tint />
+        </button>
+      )}
+    >
+      {(close) =>
+        options.map((o) => (
+          <MenuOption
+            key={o}
+            label={o}
+            selected={value === o}
+            onSelect={() => {
+              onChange(o);
+              close();
+            }}
+          />
+        ))
+      }
+    </Popover>
   );
 }
 
@@ -100,6 +134,7 @@ export function GoalsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (g: Go
   const [status, setStatus] = useState<(typeof STATUS_OPTIONS)[number]>('All goals');
   const [category, setCategory] = useState<(typeof CATEGORY_OPTIONS)[number]>('All types');
   const [sort, setSort] = useState<GoalSort>('Due date');
+  const [due, setDue] = useState<DueWindow>(state.due);
   const filtered = status !== 'All goals' || category !== 'All types';
   const goalFilterCount = (status !== 'All goals' ? 1 : 0) + (category !== 'All types' ? 1 : 0);
   const clearGoalFilters = () => {
@@ -107,7 +142,7 @@ export function GoalsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (g: Go
     setCategory('All types');
   };
 
-  const windowDays = DUE_DAYS[state.due];
+  const windowDays = DUE_DAYS[due];
   const goals = state.goals
     .filter((g) => goalStatus(state, g) === 'Completed' || daysFromToday(g.due) <= windowDays)
     .filter((g) => status === 'All goals' || goalStatus(state, g) === status)
@@ -125,6 +160,7 @@ export function GoalsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (g: Go
       <div className="card-header">
         <h2 className="t-h3 c-1">Goals</h2>
         <div className="card-actions">
+          <DateFilter value={due} options={DUE_WINDOWS} onChange={setDue} />
           <Popover
             menuClassName="menu menu--filter filter-menu"
             menuStyle={{ width: 420 }}
@@ -201,12 +237,12 @@ export function GoalsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (g: Go
               onClear={clearGoalFilters}
             />
           ) : (
-            <div className="tp-scroll">
+            <div className="tp-scroll tp-scroll--goals">
               <div className="card-list">
                 {shown.map((g) => (
                   <GoalRow key={g.id} goal={g} onOpen={() => onOpen(g)} />
                 ))}
-                {shown.length === 0 && <p className="t-body-2 c-3 filter-empty">No goals due in the {state.due.toLowerCase()}.</p>}
+                {shown.length === 0 && <p className="t-body-2 c-3 filter-empty">No goals due in the {due.toLowerCase()}.</p>}
               </div>
             </div>
           )}
@@ -251,7 +287,8 @@ export function MilestonesCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (
   const { state } = useStore();
   const navigate = useNavigate();
   const [type, setType] = useState<(typeof MS_TYPES)[number]>('All types');
-  const windowDays = DUE_DAYS[state.due];
+  const [due, setDue] = useState<DueWindow>(state.due);
+  const windowDays = DUE_DAYS[due];
   const upcoming = state.milestones
     .filter((m) => daysFromToday(m.date) >= 0 && daysFromToday(m.date) <= windowDays)
     .filter((m) => type === 'All types' || m.type === type)
@@ -264,6 +301,7 @@ export function MilestonesCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (
       <div className="card-header">
         <h2 className="t-h3 c-1">Upcoming Milestones</h2>
         <div className="card-actions">
+          <DateFilter value={due} options={DUE_WINDOWS} onChange={setDue} />
           <Popover
             menuClassName="menu menu--filter filter-menu"
             menuStyle={{ width: 240 }}
@@ -307,16 +345,16 @@ export function MilestonesCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (
           {shown.length === 0 && type !== 'All types' ? (
             <NoMatch
               title="No milestones match this filter"
-              lines={[`No ${type.toLowerCase()} milestones are due in the ${state.due.toLowerCase()}.`, 'Try All time in Due in or clear the filter.']}
+              lines={[`No ${type.toLowerCase()} milestones are due in the ${due.toLowerCase()}.`, 'Try another date or clear the filter.']}
               onClear={() => setType('All types')}
             />
           ) : (
-            <div className="tp-scroll">
+            <div className="tp-scroll tp-scroll--goals">
               <div className="card-list card-list--tight">
                 {shown.map((m) => (
                   <MilestoneRow key={m.id} m={m} onOpen={() => onOpen(m)} />
                 ))}
-                {shown.length === 0 && <p className="t-body-2 c-3 filter-empty">No milestones due in the {state.due.toLowerCase()}.</p>}
+                {shown.length === 0 && <p className="t-body-2 c-3 filter-empty">No milestones due in the {due.toLowerCase()}.</p>}
               </div>
             </div>
           )}
@@ -349,8 +387,9 @@ export function ConversionCard() {
   const { state } = useStore();
   const navigate = useNavigate();
   const [hovered, setHovered] = useState<number | null>(null);
+  const [range, setRange] = useState<Range>(state.range);
   const live = state.connections.some((c) => c.connected) && state.touchpoints.length > 0;
-  const m = RANGE_DAYS[state.range] / 7;
+  const m = RANGE_DAYS[range] / 7;
   const patrons = state.kpis.find((k) => k.id === 'patreon')?.value ?? 0;
   const f = funnelOf(state);
   const impressions = f.impressions * m;
@@ -370,7 +409,10 @@ export function ConversionCard() {
     <section className="card">
       <div className="card-header">
         <h2 className="t-h3 c-1">Conversion Points</h2>
-        <LinkButton label="View analytics" onClick={() => navigate('/analytics')} />
+        <div className="card-actions">
+          <DateFilter value={range} options={RANGES} onChange={setRange} />
+          <LinkButton label="View analytics" onClick={() => navigate('/analytics')} />
+        </div>
       </div>
       <div className={`funnel ${live && hovered !== null ? 'has-hover' : ''}`} onMouseLeave={() => setHovered(null)}>
         {stages.map((s, i) => {
@@ -423,7 +465,7 @@ export function ConversionCard() {
 
 const TP_TYPES = ['All types', 'Short-form', 'Press', 'Storefront', 'Event'] as const;
 const TP_PLATFORMS = ['All platforms', 'TikTok', 'Instagram', 'YouTube', 'Steam'] as const;
-const THUMB_ICON = { press: 'tp-press', storefront: 'tp-storefront', community: 'tp-community', megaphone: 'tp-megaphone' } as const;
+export const THUMB_ICON = { press: 'tp-press', storefront: 'tp-storefront', community: 'tp-community', megaphone: 'tp-megaphone' } as const;
 
 export function TouchpointRow({ t, onOpen, className = '', trailing }: { t: Touchpoint; onOpen: () => void; className?: string; trailing?: React.ReactNode }) {
   return (
@@ -452,8 +494,9 @@ export function TouchpointsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: 
   const { state } = useStore();
   const [type, setType] = useState<(typeof TP_TYPES)[number]>('All types');
   const [platform, setPlatform] = useState<(typeof TP_PLATFORMS)[number]>('All platforms');
+  const [range, setRange] = useState<Range>(state.range);
   const list = state.touchpoints
-    .filter((t) => inRange(t, RANGE_DAYS[state.range]))
+    .filter((t) => inRange(t, RANGE_DAYS[range]))
     .filter((t) => type === 'All types' || t.kind === type)
     .filter((t) => platform === 'All platforms' || t.platform === platform)
     .sort((a, b) => b.date.localeCompare(a.date) || (a.hoursAgo ?? 24) - (b.hoursAgo ?? 24));
@@ -465,6 +508,7 @@ export function TouchpointsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: 
           Touchpoint updates
         </h2>
         <div className="card-actions">
+          <DateFilter value={range} options={RANGES} onChange={setRange} />
           <Popover
             menuClassName="menu menu--filter filter-menu"
             menuStyle={{ width: 440 }}
@@ -499,12 +543,14 @@ export function TouchpointsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: 
                   >
                     Clear all
                   </button>
-                  <p className="t-body-2 c-3">Dates follow the range bar</p>
+                  <p className="t-body-2 c-3">Dates use the date filter</p>
                 </div>
               </>
             )}
           </Popover>
-          <AddButton onClick={onAdd} />
+          <button type="button" className="btn btn--primary t-btn" onClick={onAdd}>
+            {'Add Touchpoint + '}
+          </button>
         </div>
       </div>
 
@@ -534,7 +580,7 @@ export function TouchpointsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: 
       ) : list.length === 0 && (type !== 'All types' || platform !== 'All platforms') ? (
         <NoMatch
           title="No touchpoints match this filter"
-          lines={[`Nothing from the ${state.range.toLowerCase()} matches.`, 'Try another type or platform, or clear the filter.']}
+          lines={[`Nothing from the ${range.toLowerCase()} matches.`, 'Try another type or platform, or clear the filter.']}
           onClear={() => {
             setType('All types');
             setPlatform('All platforms');
@@ -546,7 +592,7 @@ export function TouchpointsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: 
             {list.map((t) => (
               <TouchpointRow key={t.id} t={t} onOpen={() => onOpen(t)} />
             ))}
-            {list.length === 0 && <p className="t-body-2 c-3 filter-empty">No touchpoints in the {state.range.toLowerCase()}.</p>}
+            {list.length === 0 && <p className="t-body-2 c-3 filter-empty">No touchpoints in the {range.toLowerCase()}.</p>}
           </div>
         </div>
       )}

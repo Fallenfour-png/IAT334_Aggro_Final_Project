@@ -958,52 +958,77 @@
 }
 
 /* ======================================================================
- * Home redesign (Figma 3596:54257): one title row, compact KPIs, three columns
+ * Home (Figma 3726:60269): project header, range bar, KPIs, two 2-up rows
  * ==================================================================== */
-.home-title {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  min-width: 0;
+
+/* Figma "Project Header": 20/16 padding, cover | info | side column */
+.project-header {
+  padding: 16px 20px;
+  align-items: flex-start;
 }
-.home-title .dashboard-range__left {
-  margin-left: 0;
+/* Figma "Game Cover" in the header: 142x180, 24px title */
+.game-cover--small {
+  width: 142px;
+  min-height: 0;
+  height: 180px;
+  border-radius: 11.729px;
+  padding: 16.421px;
+}
+.game-cover--small p {
+  font-size: 24px;
+}
+.project-info__top {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-/* Figma "Progress": white pill with the campaign bar */
-.campaign-pill {
-  flex: 1 1 520px;
-  min-width: 0;
-  max-width: 640px;
-  height: 40px;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-pill);
-  background: var(--card);
-  padding: 8px 16px;
+/* Figma "Frame 195": Top Performer above "Add Touchpoint +" and "Switch Project" */
+.header-side {
+  width: 320px;
+}
+.header-side__actions {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 16px;
 }
-.campaign-pill__bar {
-  flex: 1 1 auto;
-  min-width: 60px;
-  height: 8px;
-  border-radius: 4px;
-  background: var(--border-strong);
+.top-performer {
+  padding: 12px 16px;
+  gap: 8px;
+  cursor: pointer;
+}
+.top-performer.is-empty {
+  cursor: default;
+}
+.top-performer.is-empty:hover {
+  border-color: var(--border);
+  background: var(--card);
+}
+.top-performer__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.track-link:hover {
+  text-decoration: underline;
+}
+.post__meta {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.post__meta .ellipsis {
+  white-space: nowrap;
   overflow: hidden;
-}
-.campaign-pill__bar span {
-  display: block;
-  height: 100%;
-  border-radius: 4px;
-  background: var(--accent);
+  text-overflow: ellipsis;
 }
 
 /* Figma "Switch Project button": outline, opens the Games screen */
 .switch-btn {
-  margin-left: auto;
   gap: 6px;
-  padding: 7px 11px;
+  padding: 7px 15px;
 }
 .switch-btn:hover {
   color: var(--text-accent);
@@ -1011,50 +1036,15 @@
   background: var(--accent-tint);
 }
 
-.home-columns {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--card-gap);
-}
-.home-columns > .card {
-  /* Figma 650px at 1080 tall: the three columns fill the rest of the screen without scrolling. */
-  height: clamp(560px, calc(100vh - 436px), 760px);
-  min-width: 0;
-  overflow: hidden;
-}
-.home-columns > .card:hover {
-  border-color: var(--border-strong);
-}
-.home-columns .tp-scroll {
-  flex: 1 1 auto;
-  height: auto;
-  min-height: 0;
-}
-.home-columns .empty-state {
-  min-height: 0;
+/* Card date filters sit beside the card's other header buttons */
+.date-filter {
+  gap: 8px;
 }
 
-/* Figma's 650px columns fit 5 goals and 6 milestones: slightly tighter rows than the old two-column Home. */
-.home-columns .goal-row {
-  padding-top: 10px;
-  padding-bottom: 10px;
+/* Goals and Upcoming Milestones lists: Figma 452px list area, scrolling past that */
+.tp-scroll--goals {
+  height: 452px;
 }
-.home-columns .milestone-row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-}
-.home-columns .card-header h2 {
+.dash-row .card-header h2 {
   white-space: nowrap;
-}
-.home-columns .card-list:not(.card-list--tight) {
-  gap: 12px;
-}
-/* Touchpoint rows in the Home column: each line stays on one line (long titles end in …) */
-.home-columns .tp-row__text {
-  min-width: 0;
-}
-.home-columns .tp-row__text p {
-  white-space: pre;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }

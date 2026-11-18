@@ -10,11 +10,29 @@ export function GameThumb({ project, size }: { project: Project; size: [number, 
   return <img className="game-thumb" src={iconUrl('game-cover-hollow')} alt="" width={w} height={h} />;
 }
 
+/** Signal art positions: the larger Settings cover, and Figma's 142x180 Home header cover (3726:60849). */
+const RINGS = {
+  large: [
+    { left: 50.36, top: -34.03, size: 204.167 },
+    { left: 84.39, top: 0, size: 136.111 },
+    { left: 115.7, top: 31.3, size: 73.5 },
+    { left: 144.28, top: 59.89, size: 16.333 },
+  ],
+  small: [
+    { left: 43.4, top: -29.32, size: 175.94 },
+    { left: 72.72, top: 0, size: 117.29 },
+    { left: 99.7, top: 26.98, size: 63.34 },
+    { left: 124.33, top: 51.61, size: 14.08 },
+  ],
+};
+const RING_ICONS = ['signal-ring-1', 'signal-ring-2', 'signal-ring-3', 'signal-core'];
+
 /** Figma "Game Cover": the drawn Hollow Signal cover, or the uploaded cover image. */
-export function GameCover({ project }: { project: Project }) {
+export function GameCover({ project, small = false }: { project: Project; small?: boolean }) {
+  const sizeClass = small ? ' game-cover--small' : '';
   if (project.coverImage) {
     return (
-      <div className="game-cover game-cover--image">
+      <div className={`game-cover game-cover--image${sizeClass}`}>
         <img src={project.coverImage} alt={`${project.name} cover`} />
       </div>
     );
@@ -22,7 +40,7 @@ export function GameCover({ project }: { project: Project }) {
   if (project.coverGradient) {
     const [from, to] = project.coverGradient;
     return (
-      <div className="game-cover" style={{ background: `linear-gradient(to bottom, ${from}, ${to})` }}>
+      <div className={`game-cover${sizeClass}`} style={{ background: `linear-gradient(to bottom, ${from}, ${to})` }}>
         <p className="t-h3">
           {project.coverTop}
           <br />
@@ -32,11 +50,10 @@ export function GameCover({ project }: { project: Project }) {
     );
   }
   return (
-    <div className="game-cover">
-      <img src={iconUrl('signal-ring-1')} alt="" style={{ left: 50.36, top: -34.03, width: 204.167, height: 204.167 }} />
-      <img src={iconUrl('signal-ring-2')} alt="" style={{ left: 84.39, top: 0, width: 136.111, height: 136.111 }} />
-      <img src={iconUrl('signal-ring-3')} alt="" style={{ left: 115.7, top: 31.3, width: 73.5, height: 73.5 }} />
-      <img src={iconUrl('signal-core')} alt="" style={{ left: 144.28, top: 59.89, width: 16.333, height: 16.333 }} />
+    <div className={`game-cover${sizeClass}`}>
+      {RINGS[small ? 'small' : 'large'].map((r, i) => (
+        <img key={RING_ICONS[i]} src={iconUrl(RING_ICONS[i])} alt="" style={{ left: r.left, top: r.top, width: r.size, height: r.size }} />
+      ))}
       <p className="t-h3">
         {project.coverTop}
         <br />
