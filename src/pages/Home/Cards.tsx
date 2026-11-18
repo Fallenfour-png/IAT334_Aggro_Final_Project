@@ -18,6 +18,7 @@ import {
   type Touchpoint,
 } from '../../state/types';
 import { FilterButton, FilterChips, MenuOption, Popover } from '../../components/ui/Menu';
+import { useMediaQuery } from '../../lib/useMediaQuery';
 import { inRange } from './HeaderSection';
 
 function AddButton({ onClick }: { onClick: () => void }) {
@@ -92,6 +93,22 @@ function DateFilter<T extends string>({ value, options, onChange }: { value: T; 
   );
 }
 
+/** At 1650px and below the card date filter folds into the card's Filter menu as a DATE column. */
+function useCompactFilters() {
+  return useMediaQuery('(max-width: 1650px)');
+}
+
+function DateColumn<T extends string>({ value, options, onChange }: { value: T; options: readonly T[]; onChange: (v: T) => void }) {
+  return (
+    <div className="menu-column">
+      <p className="t-banner menu-heading">DATE</p>
+      {options.map((o) => (
+        <MenuOption key={o} label={o} selected={value === o} onSelect={() => onChange(o)} />
+      ))}
+    </div>
+  );
+}
+
 /* ---------------- Goals ---------------- */
 
 const STATUS_OPTIONS: ('All goals' | GoalStatus)[] = ['All goals', 'On track', 'Behind', 'Completed', 'Not started'];
@@ -135,11 +152,14 @@ export function GoalsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (g: Go
   const [category, setCategory] = useState<(typeof CATEGORY_OPTIONS)[number]>('All types');
   const [sort, setSort] = useState<GoalSort>('Due date');
   const [due, setDue] = useState<DueWindow>(state.due);
+  const compact = useCompactFilters();
+  const dateOn = compact && due !== state.due;
   const filtered = status !== 'All goals' || category !== 'All types';
-  const goalFilterCount = (status !== 'All goals' ? 1 : 0) + (category !== 'All types' ? 1 : 0);
+  const goalFilterCount = (status !== 'All goals' ? 1 : 0) + (category !== 'All types' ? 1 : 0) + (dateOn ? 1 : 0);
   const clearGoalFilters = () => {
     setStatus('All goals');
     setCategory('All types');
+    if (compact) setDue(state.due);
   };
 
   const windowDays = DUE_DAYS[due];
@@ -160,10 +180,10 @@ export function GoalsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (g: Go
       <div className="card-header">
         <h2 className="t-h3 c-1">Goals</h2>
         <div className="card-actions">
-          <DateFilter value={due} options={DUE_WINDOWS} onChange={setDue} />
+          {!compact && <DateFilter value={due} options={DUE_WINDOWS} onChange={setDue} />}
           <Popover
             menuClassName="menu menu--filter filter-menu"
-            menuStyle={{ width: 420 }}
+            menuStyle={{ width: compact ? 600 : 420 }}
             trigger={({ open, toggle }) => <FilterButton open={open} onClick={toggle} count={goalFilterCount} />}
           >
             {() => (
@@ -181,6 +201,7 @@ export function GoalsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (g: Go
                       <MenuOption key={o} label={o} selected={category === o} onSelect={() => setCategory(o)} />
                     ))}
                   </div>
+                  {compact && <DateColumn value={due} options={DUE_WINDOWS} onChange={setDue} />}
                 </div>
                 <div className="menu-divider" />
                 <p className="t-banner menu-heading">SORT BY</p>
@@ -194,8 +215,7 @@ export function GoalsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (g: Go
                     type="button"
                     className="t-btn c-accent"
                     onClick={() => {
-                      setStatus('All goals');
-                      setCategory('All types');
+                      clearGoalFilters();
                       setSort('Due date');
                     }}
                   >
@@ -214,6 +234,7 @@ export function GoalsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (g: Go
         chips={[
           ...(status !== 'All goals' ? [{ label: status, onRemove: () => setStatus('All goals') }] : []),
           ...(category !== 'All types' ? [{ label: category, onRemove: () => setCategory('All types') }] : []),
+          ...(dateOn ? [{ label: due, onRemove: () => setDue(state.due) }] : []),
         ]}
         onClear={clearGoalFilters}
       />
@@ -288,6 +309,12 @@ export function MilestonesCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (
   const navigate = useNavigate();
   const [type, setType] = useState<(typeof MS_TYPES)[number]>('All types');
   const [due, setDue] = useState<DueWindow>(state.due);
+  const compact = useCompactFilters();
+  const dateOn = compact && due !== state.due;
+  const clearMsFilters = () => {
+    setType('All types');
+    if (compact) setDue(state.due);
+  };
   const windowDays = DUE_DAYS[due];
   const upcoming = state.milestones
     .filter((m) => daysFromToday(m.date) >= 0 && daysFromToday(m.date) <= windowDays)
@@ -301,25 +328,30 @@ export function MilestonesCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (
       <div className="card-header">
         <h2 className="t-h3 c-1">Upcoming Milestones</h2>
         <div className="card-actions">
-          <DateFilter value={due} options={DUE_WINDOWS} onChange={setDue} />
+          {!compact && <DateFilter value={due} options={DUE_WINDOWS} onChange={setDue} />}
           <Popover
             menuClassName="menu menu--filter filter-menu"
-            menuStyle={{ width: 240 }}
-            trigger={({ open, toggle }) => <FilterButton open={open} onClick={toggle} count={type !== 'All types' ? 1 : 0} />}
+            menuStyle={{ width: compact ? 420 : 240 }}
+            trigger={({ open, toggle }) => (
+              <FilterButton open={open} onClick={toggle} count={(type !== 'All types' ? 1 : 0) + (dateOn ? 1 : 0)} />
+            )}
           >
             {() => (
               <>
-                <div className="menu-column">
-                  <p className="t-banner menu-heading">TYPE</p>
-                  {MS_TYPES.map((o) => (
-                    <MenuOption key={o} label={o} selected={type === o} onSelect={() => setType(o)} />
-                  ))}
+                <div className="menu-columns">
+                  <div className="menu-column">
+                    <p className="t-banner menu-heading">TYPE</p>
+                    {MS_TYPES.map((o) => (
+                      <MenuOption key={o} label={o} selected={type === o} onSelect={() => setType(o)} />
+                    ))}
+                  </div>
+                  {compact && <DateColumn value={due} options={DUE_WINDOWS} onChange={setDue} />}
                 </div>
                 <div className="menu-footer">
-                  <button type="button" className="t-btn c-accent" onClick={() => setType('All types')}>
+                  <button type="button" className="t-btn c-accent" onClick={clearMsFilters}>
                     Clear all
                   </button>
-                  <p className="t-body-2 c-3">1 selected</p>
+                  <p className="t-body-2 c-3">{compact ? '2 selected' : '1 selected'}</p>
                 </div>
               </>
             )}
@@ -329,8 +361,11 @@ export function MilestonesCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (
       </div>
 
       <FilterChips
-        chips={type !== 'All types' ? [{ label: type, onRemove: () => setType('All types') }] : []}
-        onClear={() => setType('All types')}
+        chips={[
+          ...(type !== 'All types' ? [{ label: type, onRemove: () => setType('All types') }] : []),
+          ...(dateOn ? [{ label: due, onRemove: () => setDue(state.due) }] : []),
+        ]}
+        onClear={clearMsFilters}
       />
 
       {state.milestones.length === 0 ? (
@@ -346,7 +381,7 @@ export function MilestonesCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: (
             <NoMatch
               title="No milestones match this filter"
               lines={[`No ${type.toLowerCase()} milestones are due in the ${due.toLowerCase()}.`, 'Try another date or clear the filter.']}
-              onClear={() => setType('All types')}
+              onClear={clearMsFilters}
             />
           ) : (
             <div className="tp-scroll tp-scroll--goals">
@@ -495,6 +530,13 @@ export function TouchpointsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: 
   const [type, setType] = useState<(typeof TP_TYPES)[number]>('All types');
   const [platform, setPlatform] = useState<(typeof TP_PLATFORMS)[number]>('All platforms');
   const [range, setRange] = useState<Range>(state.range);
+  const compact = useCompactFilters();
+  const dateOn = compact && range !== state.range;
+  const clearTpFilters = () => {
+    setType('All types');
+    setPlatform('All platforms');
+    if (compact) setRange(state.range);
+  };
   const list = state.touchpoints
     .filter((t) => inRange(t, RANGE_DAYS[range]))
     .filter((t) => type === 'All types' || t.kind === type)
@@ -508,12 +550,16 @@ export function TouchpointsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: 
           Touchpoint updates
         </h2>
         <div className="card-actions">
-          <DateFilter value={range} options={RANGES} onChange={setRange} />
+          {!compact && <DateFilter value={range} options={RANGES} onChange={setRange} />}
           <Popover
             menuClassName="menu menu--filter filter-menu"
-            menuStyle={{ width: 440 }}
+            menuStyle={{ width: compact ? 640 : 440 }}
             trigger={({ open, toggle }) => (
-              <FilterButton open={open} onClick={toggle} count={(type !== 'All types' ? 1 : 0) + (platform !== 'All platforms' ? 1 : 0)} />
+              <FilterButton
+                open={open}
+                onClick={toggle}
+                count={(type !== 'All types' ? 1 : 0) + (platform !== 'All platforms' ? 1 : 0) + (dateOn ? 1 : 0)}
+              />
             )}
           >
             {() => (
@@ -531,19 +577,13 @@ export function TouchpointsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: 
                       <MenuOption key={o} label={o} selected={platform === o} onSelect={() => setPlatform(o)} />
                     ))}
                   </div>
+                  {compact && <DateColumn value={range} options={RANGES} onChange={setRange} />}
                 </div>
                 <div className="menu-footer">
-                  <button
-                    type="button"
-                    className="t-btn c-accent"
-                    onClick={() => {
-                      setType('All types');
-                      setPlatform('All platforms');
-                    }}
-                  >
+                  <button type="button" className="t-btn c-accent" onClick={clearTpFilters}>
                     Clear all
                   </button>
-                  <p className="t-body-2 c-3">Dates use the date filter</p>
+                  <p className="t-body-2 c-3">{compact ? 'Applies as you select' : 'Dates use the date filter'}</p>
                 </div>
               </>
             )}
@@ -558,11 +598,9 @@ export function TouchpointsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: 
         chips={[
           ...(type !== 'All types' ? [{ label: type, onRemove: () => setType('All types') }] : []),
           ...(platform !== 'All platforms' ? [{ label: platform, onRemove: () => setPlatform('All platforms') }] : []),
+          ...(dateOn ? [{ label: range, onRemove: () => setRange(state.range) }] : []),
         ]}
-        onClear={() => {
-          setType('All types');
-          setPlatform('All platforms');
-        }}
+        onClear={clearTpFilters}
       />
 
       {state.touchpoints.length === 0 ? (
@@ -581,10 +619,7 @@ export function TouchpointsCard({ onAdd, onOpen }: { onAdd: () => void; onOpen: 
         <NoMatch
           title="No touchpoints match this filter"
           lines={[`Nothing from the ${range.toLowerCase()} matches.`, 'Try another type or platform, or clear the filter.']}
-          onClear={() => {
-            setType('All types');
-            setPlatform('All platforms');
-          }}
+          onClear={clearTpFilters}
         />
       ) : (
         <div className="tp-scroll">
