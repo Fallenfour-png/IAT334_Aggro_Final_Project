@@ -17,7 +17,7 @@ type Open =
   | { kind: 'milestone'; milestone?: Milestone; date?: string }
   | { kind: 'goal'; goal?: Goal; date?: string }
   | { kind: 'opp'; opp: Opp }
-  | { kind: 'find'; what: 'fund' | 'event' }
+  | { kind: 'find'; what: 'fund' | 'event'; date?: string }
   | null;
 
 export function PlanPage() {
@@ -79,7 +79,7 @@ export function PlanPage() {
             onAdd={(kind, date) => {
               if (kind === 'milestone') setOpen({ kind: 'milestone', date });
               else if (kind === 'goal') setOpen({ kind: 'goal', date });
-              else setOpen({ kind: 'find', what: kind });
+              else setOpen({ kind: 'find', what: kind, date });
             }}
           />
           <div className="plan-side">
@@ -104,7 +104,7 @@ export function PlanPage() {
       )}
       {open?.kind === 'goal' && <GoalDialog key={open.goal?.id ?? `new-${open.date ?? ''}`} goal={open.goal} defaultDate={open.date} onClose={close} />}
       {open?.kind === 'opp' && <OppDetailsDialog opp={open.opp} onClose={close} />}
-      {open?.kind === 'find' && <FindDialog kind={open.what} onClose={close} />}
+      {open?.kind === 'find' && <FindDialog kind={open.what} date={open.date} onClose={close} />}
     </AppLayout>
   );
 }

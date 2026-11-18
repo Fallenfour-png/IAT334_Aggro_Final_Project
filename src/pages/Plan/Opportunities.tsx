@@ -6,7 +6,7 @@ import { useStore } from '../../state/store';
 import type { EventItem, Fund } from '../../state/types';
 import { CloseButton, Dialog, FieldLabel, StackedConfirm, TextField } from '../../components/ui/Dialog';
 import { FilterButton, FilterChips, MenuOption, Popover } from '../../components/ui/Menu';
-import { dateRange, dueLabel, mediumDate, urgency } from './planData';
+import { dateRange, dueLabel, longDate, mediumDate, urgency } from './planData';
 
 export type Opp = { kind: 'fund'; id: string } | { kind: 'event'; id: string };
 
@@ -316,13 +316,14 @@ export function OppDetailsDialog({ opp, onClose }: { opp: Opp; onClose: () => vo
 
 /* ---------------- Find funds / events ---------------- */
 
-export function FindDialog({ kind, onClose }: { kind: 'fund' | 'event'; onClose: () => void }) {
+/** `date`: opened from a calendar day's Add menu, so the list starts on that day. */
+export function FindDialog({ kind, date, onClose }: { kind: 'fund' | 'event'; date?: string; onClose: () => void }) {
   const { state, setFund, setEvent } = useStore();
   const [q, setQ] = useState('');
   const [detail, setDetail] = useState<string | null>(null);
   const query = q.trim().toLowerCase();
 
-  type Row = { id: string; title: string; meta: string; date: string; added: boolean; recommended: boolean; text: string };
+  type Row = { id: string; title: string; meta: string; date: string; end?: string; added: boolean; recommended: boolean; text: string };
   const all: Row[] = (
     kind === 'fund'
       ? state.funds.map((f) => ({
@@ -339,6 +340,7 @@ export function FindDialog({ kind, onClose }: { kind: 'fund' | 'event'; onClose:
           title: e.name,
           meta: `${e.where}  •  ${dateRange(e.start, e.end)}`,
           date: e.start,
+          end: e.end,
           added: e.listed,
           recommended: !!e.recommended,
           text: `${e.name} ${e.where} ${e.line1} ${e.audience}`,
@@ -351,7 +353,11 @@ export function FindDialog({ kind, onClose }: { kind: 'fund' | 'event'; onClose:
     .filter((r) => !r.added && daysFromToday(r.date) >= 0)
     .sort((a, b) => Number(b.recommended) - Number(a.recommended) || a.date.localeCompare(b.date))
     .slice(0, 4);
-  const results = query ? all.filter((r) => r.text.toLowerCase().includes(query)) : [];
+  // From a calendar day: what's on that day (events cover start..end).
+  const onDay = date ? all.filter((r) => (r.end ? r.date <= date && date <= r.end : r.date === date)) : [];
+  // Opened from a day, search only looks within that day.
+  const results = query ? (date ? onDay : all).filter((r) => r.text.toLowerCase().includes(query)) : [];
+  const dayLabel = date ? longDate(date).replace(/, \d{4}$/, '') : '';
 
   const add = (id: string) =>
     kind === 'fund' ? setFund(id, { listed: true, saved: true }, 'Fund added') : setEvent(id, { listed: true, saved: true }, 'Event added');
@@ -396,7 +402,13 @@ export function FindDialog({ kind, onClose }: { kind: 'fund' | 'event'; onClose:
   return (
     <Dialog
       title={kind === 'fund' ? 'Find Funds' : 'Find Events'}
-      subtitle={kind === 'fund' ? 'Explore more funds for your project' : 'Search for more events happening'}
+      subtitle={
+        date
+          ? `${kind === 'fund' ? 'Funds' : 'Events'} on ${longDate(date)}`
+          : kind === 'fund'
+            ? 'Explore more funds for your project'
+            : 'Search for more events happening'
+      }
       // While details are open on top, Esc / outside click should only close the details.
       onClose={detail ? () => {} : onClose}
     >
@@ -405,13 +417,35 @@ export function FindDialog({ kind, onClose }: { kind: 'fund' | 'event'; onClose:
         <TextField value={q} onChange={setQ} placeholder={kind === 'fund' ? 'Search name, organization, who it’s for' : 'Search name, city, type'} />
       </div>
       <div className="find-results">
+        {query ? null : date ? (
+          onDay.length > 0 ? (
+            <>
+              <p className="find-section">ON {dayLabel.toUpperCase()}</p>
+              {onDay.map(row)}
+            </>
+          ) : (
+            <>
+              <p className="find-section">ADDED</p>
+              {added.map(row)}
+              {added.length === 0 && <p className="t-body-2 c-3 find-none">No {noun} added yet.</p>}
+              <p className="t-body-2 c-3 find-none find-none--day">
+                No more {noun} on this day.
+              </p>
+            </>
+          )
+        ) : null}
         {query ? (
           <>
             <p className="find-section">RESULTS</p>
             {results.map(row)}
-            {results.length === 0 && <p className="t-body-2 c-3 find-none">Nothing matches “{q.trim()}”.</p>}
+            {results.length === 0 &&
+              (date ? (
+                <p className="t-body-2 c-3 find-none">No more {noun} on this day.</p>
+              ) : (
+                <p className="t-body-2 c-3 find-none">Nothing matches “{q.trim()}”.</p>
+              ))}
           </>
-        ) : (
+        ) : date ? null : (
           <>
             <p className="find-section">ADDED</p>
             {added.map(row)}
