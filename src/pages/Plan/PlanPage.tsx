@@ -15,9 +15,9 @@ import './plan.css';
 
 type Open =
   | { kind: 'milestone'; milestone?: Milestone; date?: string }
-  | { kind: 'goal'; goal: Goal }
+  | { kind: 'goal'; goal?: Goal; date?: string }
   | { kind: 'opp'; opp: Opp }
-  | { kind: 'find'; what: 'fund' | 'event' }
+  | { kind: 'find'; what: 'fund' | 'event'; date?: string }
   | null;
 
 export function PlanPage() {
@@ -37,7 +37,6 @@ export function PlanPage() {
     setSelected([iso]);
     requestAnimationFrame(() => {
       document.getElementById('plan-calendar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      document.getElementById(`day-card-${iso}`)?.scrollIntoView({ block: 'nearest' });
     });
   };
 
@@ -70,13 +69,24 @@ export function PlanPage() {
 
         <MilestoneHero milestone={upcoming} onPickDate={showOnCalendar} onAddMilestone={() => setOpen({ kind: 'milestone' })} />
 
-        <CalendarCard
-          selected={selected}
-          onSelect={setSelected}
-          view={view}
-          onView={setView}
-          onOpenItem={openItem}
-        />
+        <div className="plan-grid">
+          <CalendarCard
+            selected={selected}
+            onSelect={setSelected}
+            view={view}
+            onView={setView}
+            onOpenItem={openItem}
+            onAdd={(kind, date) => {
+              if (kind === 'milestone') setOpen({ kind: 'milestone', date });
+              else if (kind === 'goal') setOpen({ kind: 'goal', date });
+              else setOpen({ kind: 'find', what: kind, date });
+            }}
+          />
+          <div className="plan-side">
+            <FundsSection onOpen={(opp) => setOpen({ kind: 'opp', opp })} onFind={() => setOpen({ kind: 'find', what: 'fund' })} />
+            <EventsSection onOpen={(opp) => setOpen({ kind: 'opp', opp })} onFind={() => setOpen({ kind: 'find', what: 'event' })} />
+          </div>
+        </div>
 
         <div className="dash-row">
           <PlanMilestones
@@ -87,17 +97,14 @@ export function PlanPage() {
           />
           <PlanTouchpoints />
         </div>
-
-        <FundsSection onOpen={(opp) => setOpen({ kind: 'opp', opp })} onFind={() => setOpen({ kind: 'find', what: 'fund' })} />
-        <EventsSection onOpen={(opp) => setOpen({ kind: 'opp', opp })} onFind={() => setOpen({ kind: 'find', what: 'event' })} />
       </main>
 
       {open?.kind === 'milestone' && (
         <MilestoneDialog key={open.milestone?.id ?? `new-${open.date ?? ''}`} milestone={open.milestone} defaultDate={open.date} onClose={close} />
       )}
-      {open?.kind === 'goal' && <GoalDialog key={open.goal.id} goal={open.goal} onClose={close} />}
+      {open?.kind === 'goal' && <GoalDialog key={open.goal?.id ?? `new-${open.date ?? ''}`} goal={open.goal} defaultDate={open.date} onClose={close} />}
       {open?.kind === 'opp' && <OppDetailsDialog opp={open.opp} onClose={close} />}
-      {open?.kind === 'find' && <FindDialog kind={open.what} onClose={close} />}
+      {open?.kind === 'find' && <FindDialog kind={open.what} date={open.date} onClose={close} />}
     </AppLayout>
   );
 }

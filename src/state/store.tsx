@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { DEMO_KPIS, demoState, freshState } from './seeds';
+import { DEMO_KPIS, EVENTS, FUNDS, demoState, freshState } from './seeds';
 import { withGame, withNewGame } from './games';
 import { withTestData } from './testData';
 import { formatShort } from '../lib/dates';
@@ -14,7 +14,7 @@ function load(): AppState {
       const parsed = JSON.parse(raw) as AppState;
       if (parsed.version === 2) {
         if (!RANGES.includes(parsed.range)) parsed.range = 'Last 7 days';
-        return withNewKpis(parsed);
+        return withNewCatalog(withNewKpis(parsed));
       }
     }
   } catch {
@@ -35,6 +35,19 @@ function withNewKpis(s: AppState): AppState {
     const connections =
       w.seed === 'demo' ? w.connections.map((c) => (c.id === 'instagram' ? { ...c, connected: true } : c)) : w.connections;
     return { ...w, kpis, connections };
+  };
+  return { ...s, ...fix(s), otherGames: s.otherGames?.map(fix) };
+}
+
+/** Saved data gets funds/events added to the catalog later (not listed or saved; find them via Find). */
+function withNewCatalog(s: AppState): AppState {
+  const fix = (w: Workspace): Workspace => {
+    const evIds = new Set(w.events.map((e) => e.id));
+    const fdIds = new Set(w.funds.map((f) => f.id));
+    const events = EVENTS.filter((e) => !evIds.has(e.id)).map((e) => ({ ...e, saved: false, listed: false }));
+    const funds = FUNDS.filter((f) => !fdIds.has(f.id)).map((f) => ({ ...f, saved: false, listed: false }));
+    if (!events.length && !funds.length) return w;
+    return { ...w, events: [...w.events, ...events], funds: [...w.funds, ...funds] };
   };
   return { ...s, ...fix(s), otherGames: s.otherGames?.map(fix) };
 }

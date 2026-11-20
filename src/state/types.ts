@@ -14,6 +14,7 @@ export const AUTO_GOAL_SOURCE: Partial<Record<GoalType, ConnectionId>> = {
   'Steam wishlists': 'steam',
   'Discord members': 'discord',
   'Patreon members': 'patreon',
+  'Newsletter subscribers': 'newsletter',
 };
 
 export type GoalCategory = 'Wishlists' | 'Community' | 'Press' | 'Content' | 'Revenue';
@@ -128,6 +129,8 @@ export interface EventItem {
   /** Shown in "Upcoming Events" on Plan. */
   listed: boolean;
   recommended?: boolean;
+  /** Official page opened by "See more". */
+  url?: string;
 }
 
 export interface Fund {
@@ -144,6 +147,8 @@ export interface Fund {
   saved: boolean;
   /** Shown in "Upcoming Funds" on Plan. */
   listed: boolean;
+  /** Official page opened by "See more". */
+  url?: string;
 }
 
 export interface Notification {

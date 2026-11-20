@@ -8,7 +8,7 @@ import type { Milestone, MilestoneType } from '../../state/types';
 import { FilterButton, FilterChips, MenuOption, Popover } from '../../components/ui/Menu';
 import { MilestoneRow, TouchpointRow } from '../Home/Cards';
 import { MetricTile, touchpointMetrics } from '../Home/TouchpointDialog';
-import { metricCurrent } from './planData';
+import { barTone, metricCurrent, milestoneGoalStatus } from './planData';
 
 const PRETTY: Record<string, string> = {
   'Steam wishlists': 'Steam Wishlists',
@@ -155,7 +155,7 @@ export function PlanMilestones({
                                   </span>
                                 </div>
                                 <div className="expand-bar">
-                                  <span style={{ width: `${goalPercent(current, g.target)}%` }} />
+                                  <span className={barTone(milestoneGoalStatus(state, g, m.date))} style={{ width: `${goalPercent(current, g.target)}%` }} />
                                 </div>
                               </div>
                               <button type="button" className="icon-btn" aria-label="Edit goal" onClick={() => onEdit(m)}>

@@ -6,7 +6,7 @@ import { newId, useStore } from '../../state/store';
 import { AUTO_GOAL_SOURCE, GOAL_TYPES, type Goal, type GoalType } from '../../state/types';
 import { DateField, Dialog, FieldLabel, NumberField, SelectField, StackedConfirm, TextField } from '../../components/ui/Dialog';
 
-const SOURCE_NAME = { steam: 'Steamworks', discord: 'Discord', patreon: 'Patreon' } as Record<string, string>;
+const SOURCE_NAME = { steam: 'Steamworks', discord: 'Discord', patreon: 'Patreon', newsletter: 'your newsletter' } as Record<string, string>;
 
 interface Draft {
   title: string;
@@ -16,15 +16,15 @@ interface Draft {
   due: string;
 }
 
-export function GoalDialog({ goal, onClose }: { goal?: Goal; onClose: () => void }) {
+export function GoalDialog({ goal, defaultDate, onClose }: { goal?: Goal; defaultDate?: string; onClose: () => void }) {
   const { state, saveGoal, removeGoal } = useStore();
   const isNew = !goal;
   const initial: Draft = useMemo(
     () =>
       goal
         ? { title: goal.title, type: goal.type, current: goal.current, target: goal.target, due: goal.due }
-        : { title: '', type: '', current: 0, target: '', due: '2026-10-14' },
-    [goal],
+        : { title: '', type: '', current: 0, target: '', due: defaultDate ?? '2026-10-14' },
+    [goal, defaultDate],
   );
   const [draft, setDraft] = useState<Draft>(initial);
   const [confirm, setConfirm] = useState<'remove' | 'discard' | null>(null);
