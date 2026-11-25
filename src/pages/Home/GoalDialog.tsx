@@ -4,7 +4,7 @@ import { formatNumber, TODAY } from '../../lib/dates';
 import { GOAL_UNIT, goalCurrent, goalPercent, isAutoGoal } from '../../state/selectors';
 import { newId, useStore } from '../../state/store';
 import { AUTO_GOAL_SOURCE, GOAL_TYPES, type Goal, type GoalType } from '../../state/types';
-import { DateField, Dialog, FieldLabel, NumberField, SelectField, StackedConfirm, TextField } from '../../components/ui/Dialog';
+import { DateField, Dialog, FieldLabel, focusFirstInvalid, NumberField, SelectField, StackedConfirm, TextField } from '../../components/ui/Dialog';
 
 const SOURCE_NAME = { steam: 'Steamworks', discord: 'Discord', patreon: 'Patreon', newsletter: 'your newsletter' } as Record<string, string>;
 
@@ -27,6 +27,7 @@ export function GoalDialog({ goal, defaultDate, onClose }: { goal?: Goal; defaul
     [goal, defaultDate, state.project?.launch],
   );
   const [draft, setDraft] = useState<Draft>(initial);
+  const [tried, setTried] = useState(false);
   const [confirm, setConfirm] = useState<'remove' | 'discard' | null>(null);
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v }));
 
@@ -41,11 +42,21 @@ export function GoalDialog({ goal, defaultDate, onClose }: { goal?: Goal; defaul
   const dateError = draft.due !== '' && draft.due < TODAY;
   const complete = draft.title.trim() !== '' && draft.type !== '' && draft.target !== '' && draft.due !== '';
   const canSave = dirty && complete && !targetError && !dateError;
+  const errors = {
+    title: !draft.title.trim() ? 'Enter a goal name.' : undefined,
+    type: !draft.type ? 'Choose a goal type.' : undefined,
+    target: draft.target === '' ? 'Enter a target.' : targetError ? `Enter a target greater than your current progress (${formatNumber(current)}).` : undefined,
+    due: !draft.due ? 'Choose a due date.' : dateError ? 'Choose today or a future date for the due date.' : undefined,
+  };
 
   const requestClose = () => (dirty ? setConfirm('discard') : onClose());
 
-  const save = () => {
-    if (!canSave) return;
+  const save = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setTried(true);
+    if (!canSave) {
+      focusFirstInvalid(event.currentTarget.closest('[role="dialog"]'));
+      return;
+    }
     const target = draft.target as number;
     const next: Goal = {
       id: goal?.id ?? newId('g'),
@@ -73,12 +84,12 @@ export function GoalDialog({ goal, defaultDate, onClose }: { goal?: Goal; defaul
     <Dialog title={isNew ? 'Add Goal' : 'Edit Goal'} subtitle={isNew ? 'Add more goals for your milestone' : 'Edit your goal'} onClose={requestClose}>
       <div className="field">
         <FieldLabel required>Your Goal</FieldLabel>
-        <TextField value={draft.title} onChange={(v) => set('title', v)} placeholder="e.g. Reach 25,000 Steam wishlists by launch" />
+        <TextField label="Goal name" value={draft.title} onChange={(v) => set('title', v)} placeholder="e.g. Reach 25,000 Steam wishlists by launch" error={tried ? errors.title : undefined} />
       </div>
 
       <div className="field">
         <FieldLabel required>Type</FieldLabel>
-        <SelectField value={draft.type} options={GOAL_TYPES} placeholder="Select a type" onChange={(v) => set('type', v)} />
+        <SelectField label="Goal type" value={draft.type} options={GOAL_TYPES} placeholder="Select a type" onChange={(v) => set('type', v)} error={tried ? errors.type : undefined} />
       </div>
 
       {draft.type !== '' &&
@@ -114,13 +125,11 @@ export function GoalDialog({ goal, defaultDate, onClose }: { goal?: Goal; defaul
       <div className="field-row">
         <div className="field">
           <FieldLabel required>Target</FieldLabel>
-          <NumberField value={draft.target} onChange={(v) => set('target', v)} placeholder="Target" error={targetError} />
-          {targetError && <p className="t-body-2 field-error">Target must be higher than current progress ({formatNumber(current)}).</p>}
+          <NumberField label="Target" value={draft.target} onChange={(v) => set('target', v)} placeholder="Target" error={tried ? errors.target : undefined} />
         </div>
         <div className="field">
           <FieldLabel required>Date</FieldLabel>
-          <DateField value={draft.due} onChange={(v) => set('due', v)} error={dateError} />
-          {dateError && <p className="t-body-2 field-error">Due date can’t be in the past.</p>}
+          <DateField label="Due date" value={draft.due} onChange={(v) => set('due', v)} error={tried ? errors.due : undefined} />
         </div>
       </div>
 
@@ -133,9 +142,9 @@ export function GoalDialog({ goal, defaultDate, onClose }: { goal?: Goal; defaul
             <Icon name="trash-14" size={14} tint />
           </button>
         )}
-        <button type="button" className="btn btn--save t-btn" disabled={!canSave} onClick={save}>
+        <button type="button" className="btn btn--save t-btn" disabled={!isNew && !dirty} onClick={save}>
           {'Save '}
-          <Icon name={canSave ? 'check-14-white' : 'check-14-muted'} size={14} />
+          <Icon name={isNew || dirty ? 'check-14-white' : 'check-14-muted'} size={14} />
         </button>
       </div>
 

@@ -5,7 +5,7 @@ import { TODAY } from '../../lib/dates';
 import { useClickOutside } from '../../lib/useClickOutside';
 import { newId, useStore } from '../../state/store';
 import { MILESTONE_TYPES, type GoalType, type Milestone, type MilestoneGoal, type MilestoneType } from '../../state/types';
-import { DateField, Dialog, FieldLabel, NumberField, SelectField, StackedConfirm, TextField } from '../../components/ui/Dialog';
+import { DateField, Dialog, FieldLabel, focusFirstInvalid, NumberField, SelectField, StackedConfirm, TextField } from '../../components/ui/Dialog';
 
 const METRICS: GoalType[] = ['Steam wishlists', 'Discord members', 'Patreon members', 'Press features', 'Short-form videos', 'Newsletter subscribers'];
 
@@ -108,6 +108,7 @@ export function MilestoneDialog({ milestone, defaultDate, onClose }: { milestone
     [milestone, defaultDate],
   );
   const [draft, setDraft] = useState<Draft>(initial);
+  const [tried, setTried] = useState(false);
   const [newGoal, setNewGoal] = useState<{ metric: GoalType | ''; target: number | '' }>({ metric: '', target: '' });
   const [confirm, setConfirm] = useState<'delete' | 'discard' | null>(null);
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v }));
@@ -116,6 +117,11 @@ export function MilestoneDialog({ milestone, defaultDate, onClose }: { milestone
   const dateError = draft.date !== '' && draft.date < TODAY && draft.date !== initial.date;
   const complete = draft.title.trim() !== '' && draft.type !== '' && draft.date !== '';
   const canSave = dirty && complete && !dateError;
+  const errors = {
+    title: !draft.title.trim() ? 'Enter a milestone name.' : undefined,
+    type: !draft.type ? 'Choose a milestone type.' : undefined,
+    date: !draft.date ? 'Choose a milestone date.' : dateError ? 'Choose today or a future date for the milestone.' : undefined,
+  };
   const showEvent = draft.type === 'Event' || draft.type === 'Deliverable';
 
   const requestClose = () => (dirty ? setConfirm('discard') : onClose());
@@ -126,8 +132,12 @@ export function MilestoneDialog({ milestone, defaultDate, onClose }: { milestone
     setNewGoal({ metric: '', target: '' });
   };
 
-  const save = () => {
-    if (!canSave) return;
+  const save = (clickEvent: React.MouseEvent<HTMLButtonElement>) => {
+    setTried(true);
+    if (!canSave) {
+      focusFirstInvalid(clickEvent.currentTarget.closest('[role="dialog"]'));
+      return;
+    }
     const goals = newGoal.metric !== '' && newGoal.target !== '' ? [...draft.goals, { metric: newGoal.metric, target: newGoal.target }] : draft.goals;
     const type = draft.type as MilestoneType;
     const event = showEvent && draft.eventId ? draft.eventId : undefined;
@@ -154,18 +164,17 @@ export function MilestoneDialog({ milestone, defaultDate, onClose }: { milestone
     >
       <div className="field">
         <FieldLabel required>Milestone</FieldLabel>
-        <TextField value={draft.title} onChange={(v) => set('title', v)} placeholder="e.g. Steam Next Fest demo submission" />
+        <TextField label="Milestone name" value={draft.title} onChange={(v) => set('title', v)} placeholder="e.g. Steam Next Fest demo submission" error={tried ? errors.title : undefined} />
       </div>
 
       <div className="field-row">
         <div className="field">
           <FieldLabel required>Type</FieldLabel>
-          <SelectField value={draft.type} options={MILESTONE_TYPES} placeholder="Select a type" onChange={(v) => set('type', v)} />
+          <SelectField label="Milestone type" value={draft.type} options={MILESTONE_TYPES} placeholder="Select a type" onChange={(v) => set('type', v)} error={tried ? errors.type : undefined} />
         </div>
         <div className="field">
           <FieldLabel required>Date</FieldLabel>
-          <DateField value={draft.date} onChange={(v) => set('date', v)} error={dateError} />
-          {dateError && <p className="t-body-2 field-error">Date can’t be in the past.</p>}
+          <DateField label="Milestone date" value={draft.date} onChange={(v) => set('date', v)} error={tried ? errors.date : undefined} />
         </div>
       </div>
 
@@ -225,9 +234,9 @@ export function MilestoneDialog({ milestone, defaultDate, onClose }: { milestone
           Delete
           <Icon name="trash-14" size={14} tint />
         </button>
-        <button type="button" className="btn btn--save t-btn" disabled={!canSave} onClick={save}>
+        <button type="button" className="btn btn--save t-btn" disabled={!isNew && !dirty} onClick={save}>
           {'Save '}
-          <Icon name={canSave ? 'check-14-white' : 'check-14-muted'} size={14} />
+          <Icon name={isNew || dirty ? 'check-14-white' : 'check-14-muted'} size={14} />
         </button>
       </div>
 

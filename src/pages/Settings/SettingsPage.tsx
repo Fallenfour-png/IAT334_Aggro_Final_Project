@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AppLayout } from '../../components/shell/AppLayout';
-import { Dialog, StackedConfirm } from '../../components/ui/Dialog';
+import { Dialog, FieldError, focusFirstInvalid, StackedConfirm } from '../../components/ui/Dialog';
 import { GameCover, GameThumb } from '../../components/ui/GameCover';
 import { Toggle } from '../../components/ui/Toggle';
 import { parseDate, TODAY } from '../../lib/dates';
@@ -334,6 +334,7 @@ function VerifyDialog({
 
 /** Not in Figma: password change built like "Change Username". Nothing is stored. */
 function PasswordDialog({ onSaved, onClose }: { onSaved: () => void; onClose: () => void }) {
+  const formId = useId();
   const [cur, setCur] = useState('');
   const [pw, setPw] = useState('');
   const [again, setAgain] = useState('');
@@ -341,27 +342,33 @@ function PasswordDialog({ onSaved, onClose }: { onSaved: () => void; onClose: ()
   const short = pw.length < 8;
   const mismatch = pw !== again;
   const ok = cur && !short && !mismatch;
-  const field = (label: string, value: string, set: (v: string) => void, error?: string) => (
-    <div className="field">
-      <p className="t-body c-2">{label}</p>
-      <label className={`input input--soft t-body ${error ? 'is-error' : ''}`}>
-        <input className="t-body" type="password" value={value} onChange={(e) => set(e.target.value)} autoComplete="new-password" />
-      </label>
-      {error && <p className="t-body-2 c-negative">{error}</p>}
-    </div>
-  );
+  const field = (label: string, value: string, set: (v: string) => void, error?: string) => {
+    const id = `${formId}-${label.replace(/\s+/g, '-')}`;
+    return (
+      <div className="field">
+        <label className="t-body field-label" htmlFor={id}>{label}</label>
+        <label className={`input input--soft t-body ${error ? 'is-error' : ''}`}>
+          <input id={id} className="t-body" type="password" value={value} onChange={(e) => set(e.target.value)} autoComplete={label === 'Current password' ? 'current-password' : 'new-password'} aria-invalid={!!error || undefined} aria-describedby={error ? `${id}-error` : undefined} />
+        </label>
+        <FieldError id={`${id}-error`} message={error} />
+      </div>
+    );
+  };
   return (
     <Dialog onClose={onClose} title="Change Password" subtitle="Use at least 8 characters" className="st-dialog">
       {field('Current password', cur, setCur, tried && !cur ? 'Enter your current password.' : undefined)}
-      {field('New password', pw, setPw, tried && short ? 'Use at least 8 characters.' : undefined)}
-      {field('Confirm new password', again, setAgain, tried && !short && mismatch ? 'The passwords don’t match.' : undefined)}
+      {field('New password', pw, setPw, tried && short ? 'Enter a new password with at least 8 characters.' : undefined)}
+      {field('Confirm new password', again, setAgain, tried && (!again || mismatch) ? 'Re-enter your new password so both passwords match.' : undefined)}
       <div className="st-actions">
         <button
           type="button"
           className="btn btn--save st-save"
-          onClick={() => {
+          onClick={(event) => {
             setTried(true);
-            if (!ok) return;
+            if (!ok) {
+              focusFirstInvalid(event.currentTarget.closest('[role="dialog"]'));
+              return;
+            }
             onSaved();
             onClose();
           }}

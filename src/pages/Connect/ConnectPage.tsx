@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { AppLayout } from '../../components/shell/AppLayout';
-import { CloseButton, Dialog } from '../../components/ui/Dialog';
+import { CloseButton, Dialog, FieldError, focusFirstInvalid } from '../../components/ui/Dialog';
 import { MenuOption, Popover } from '../../components/ui/Menu';
 import { Toggle } from '../../components/ui/Toggle';
 import { Icon } from '../../lib/icons';
@@ -228,7 +228,7 @@ function SsoWindow({ app, onCancel, onConnect }: { app: AppDef; onCancel: () => 
 /* ---------------- Edit overlay pieces ---------------- */
 
 /** Figma "Dropdown Input" + "Channel Picker" / "Channel Select". */
-function Picker({ field, value, onChange, error }: { field: PickerField; value: string | string[]; onChange: (v: string | string[]) => void; error?: boolean }) {
+function Picker({ field, value, onChange, error, describedBy }: { field: PickerField; value: string | string[]; onChange: (v: string | string[]) => void; error?: boolean; describedBy?: string }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const ref = useRef<HTMLDivElement>(null);
@@ -244,7 +244,7 @@ function Picker({ field, value, onChange, error }: { field: PickerField; value: 
   };
   return (
     <div className="popover-anchor" ref={ref} style={{ width: '100%' }}>
-      <button type="button" className={`input t-body ${open ? 'is-open' : ''} ${error ? 'is-error' : ''}`} onClick={() => setOpen((o) => !o)}>
+      <button type="button" className={`input t-body ${open ? 'is-open' : ''} ${error ? 'is-error' : ''}`} onClick={() => setOpen((o) => !o)} aria-label={field.label || field.placeholder} aria-expanded={open} aria-invalid={error || undefined} aria-describedby={describedBy}>
         <span className="nowrap picker-value">{picked.length ? picked.join(', ') : field.placeholder}</span>
         <Icon name="chevron-down" size={16} />
       </button>
@@ -274,6 +274,7 @@ function Picker({ field, value, onChange, error }: { field: PickerField; value: 
 }
 
 function FieldBlock({ field, settings, set, showErrors }: { field: PickerField; settings: ConnectionSettings; set: (k: string, v: ConnectionSettings[string]) => void; showErrors: boolean }) {
+  const feedbackId = useId();
   const value = settings[field.key] as string | string[];
   const missing = !!field.required && (Array.isArray(value) ? value.length === 0 : !value);
   const error = showErrors && missing;
@@ -285,8 +286,8 @@ function FieldBlock({ field, settings, set, showErrors }: { field: PickerField; 
           {field.required && <span className="req"> *</span>}
         </p>
       )}
-      <Picker field={field} value={value} onChange={(v) => set(field.key, v)} error={error} />
-      {(error || field.tip) && <p className={`t-body-2 ${error ? 'c-negative' : 'c-accent'}`}>{error ? field.error : field.tip}</p>}
+      <Picker field={field} value={value} onChange={(v) => set(field.key, v)} error={error} describedBy={error || field.tip ? feedbackId : undefined} />
+      {error ? <FieldError id={feedbackId} message={field.error || `Choose a value for ${field.label || 'this field'}.`} /> : field.tip && <p id={feedbackId} className="t-body-2 c-accent">{field.tip}</p>}
     </div>
   );
 }
@@ -384,9 +385,10 @@ function EditOverlay({ app, onClose }: { app: AppDef; onClose: () => void }) {
   const [confirm, setConfirm] = useState(false);
   const set = (k: string, v: ConnectionSettings[string]) => setSettings((s) => ({ ...s, [k]: v }));
 
-  const save = () => {
+  const save = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (missingRequired(app, settings)) {
       setShowErrors(true);
+      focusFirstInvalid(event.currentTarget.closest('[role="dialog"]'));
       return;
     }
     setConnection(app.id, { settings }, `${app.name} settings saved`);

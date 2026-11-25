@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../lib/icons';
 import { useClickOutside } from '../../lib/useClickOutside';
@@ -125,21 +125,38 @@ export function FieldLabel({ children, required }: { children: ReactNode; requir
   );
 }
 
+export function FieldError({ id, message }: { id: string; message?: string }) {
+  return message ? <p id={id} className="t-body-2 field-error" role="alert">{message}</p> : null;
+}
+
+export function focusFirstInvalid(root: HTMLElement | null) {
+  requestAnimationFrame(() => root?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
+}
+
+interface FieldFeedback {
+  label?: string;
+  error?: boolean | string;
+}
+
 export function TextField({
   value,
   onChange,
   placeholder,
   error,
+  label,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
-  error?: boolean;
-}) {
+} & FieldFeedback) {
+  const errorId = useId();
   return (
-    <label className={`input t-body ${error ? 'is-error' : ''}`}>
-      <input className="t-body" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
-    </label>
+    <>
+      <label className={`input t-body ${error ? 'is-error' : ''}`}>
+        <input className="t-body" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} aria-label={label} aria-invalid={!!error || undefined} aria-describedby={typeof error === 'string' ? errorId : undefined} />
+      </label>
+      <FieldError id={errorId} message={typeof error === 'string' ? error : undefined} />
+    </>
   );
 }
 
@@ -150,37 +167,45 @@ export function NumberField({
   suffix,
   error,
   readOnly,
+  label,
 }: {
   value: number | '';
   onChange?: (v: number | '') => void;
   placeholder?: string;
   suffix?: string;
-  error?: boolean;
   readOnly?: boolean;
-}) {
+} & FieldFeedback) {
+  const errorId = useId();
   const text = value === '' ? '' : value.toLocaleString('en-US');
   return (
-    <label className={`input t-body ${error ? 'is-error' : ''} ${readOnly ? 'input--readonly' : ''}`}>
-      <input
-        className="t-body"
-        inputMode="numeric"
-        value={text}
-        readOnly={readOnly}
-        placeholder={placeholder}
-        size={Math.max(1, text.length || (placeholder?.length ?? 1))}
-        style={suffix ? { flex: '0 0 auto' } : undefined}
-        onChange={(e) => {
-          const digits = e.target.value.replace(/[^0-9]/g, '');
-          onChange?.(digits === '' ? '' : Number(digits));
-        }}
-      />
-      {suffix && <span className="suffix t-body">{suffix}</span>}
-      {suffix && <span style={{ flex: 1 }} />}
-    </label>
+    <>
+      <label className={`input t-body ${error ? 'is-error' : ''} ${readOnly ? 'input--readonly' : ''}`}>
+        <input
+          className="t-body"
+          inputMode="numeric"
+          value={text}
+          readOnly={readOnly}
+          aria-label={label}
+          aria-invalid={!!error || undefined}
+          aria-describedby={typeof error === 'string' ? errorId : undefined}
+          placeholder={placeholder}
+          size={Math.max(1, text.length || (placeholder?.length ?? 1))}
+          style={suffix ? { flex: '0 0 auto' } : undefined}
+          onChange={(e) => {
+            const digits = e.target.value.replace(/[^0-9]/g, '');
+            onChange?.(digits === '' ? '' : Number(digits));
+          }}
+        />
+        {suffix && <span className="suffix t-body">{suffix}</span>}
+        {suffix && <span style={{ flex: 1 }} />}
+      </label>
+      <FieldError id={errorId} message={typeof error === 'string' ? error : undefined} />
+    </>
   );
 }
 
-export function DateField({ value, onChange, error }: { value: string; onChange: (v: string) => void; error?: boolean }) {
+export function DateField({ value, onChange, error, label = 'Date' }: { value: string; onChange: (v: string) => void } & FieldFeedback) {
+  const errorId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const openPicker = (event: React.MouseEvent | React.KeyboardEvent) => {
     const input = inputRef.current;
@@ -196,21 +221,25 @@ export function DateField({ value, onChange, error }: { value: string; onChange:
   };
 
   return (
-    <label className={`input date-input t-body ${error ? 'is-error' : ''}`} onClick={openPicker}>
-      <span>{value ? value.replace(/-/g, '/') : <span className="c-2">YYYY/MM/DD</span>}</span>
-      <Icon name="calendar-16" size={16} />
-      <input
-        ref={inputRef}
-        type="date"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') openPicker(event);
-        }}
-        aria-label="Date"
-        aria-invalid={error || undefined}
-      />
-    </label>
+    <>
+      <label className={`input date-input t-body ${error ? 'is-error' : ''}`} onClick={openPicker}>
+        <span>{value ? value.replace(/-/g, '/') : <span className="c-2">YYYY/MM/DD</span>}</span>
+        <Icon name="calendar-16" size={16} />
+        <input
+          ref={inputRef}
+          type="date"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') openPicker(event);
+          }}
+          aria-label={label}
+          aria-invalid={!!error || undefined}
+          aria-describedby={typeof error === 'string' ? errorId : undefined}
+        />
+      </label>
+      <FieldError id={errorId} message={typeof error === 'string' ? error : undefined} />
+    </>
   );
 }
 
@@ -221,37 +250,43 @@ export function SelectField<T extends string>({
   onChange,
   placeholder,
   renderValue,
+  label,
+  error,
 }: {
   value: T | '';
   options: readonly T[];
   onChange: (v: T) => void;
   placeholder?: string;
   renderValue?: (v: T) => ReactNode;
-}) {
+} & FieldFeedback) {
+  const errorId = useId();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useClickOutside(ref, open, () => setOpen(false));
   return (
-    <div className="popover-anchor" ref={ref} style={{ width: '100%' }}>
-      <button type="button" className={`input t-body ${open ? 'is-open' : ''}`} onClick={() => setOpen((o) => !o)}>
-        <span className={`nowrap ${value ? '' : 'c-2'}`}>{value ? (renderValue ? renderValue(value) : value) : placeholder}</span>
-        <Icon name="chevron-down" size={16} />
-      </button>
-      {open && (
-        <div className="select-menu" role="listbox">
-          {options.map((o) => (
-            <MenuOption
-              key={o}
-              label={o}
-              selected={o === value}
-              onSelect={() => {
-                onChange(o);
-                setOpen(false);
-              }}
-            />
-          ))}
-        </div>
-      )}
-    </div>
+    <>
+      <div className="popover-anchor" ref={ref} style={{ width: '100%' }}>
+        <button type="button" className={`input t-body ${open ? 'is-open' : ''} ${error ? 'is-error' : ''}`} onClick={() => setOpen((o) => !o)} aria-label={label} aria-expanded={open} aria-invalid={!!error || undefined} aria-describedby={typeof error === 'string' ? errorId : undefined}>
+          <span className={`nowrap ${value ? '' : 'c-2'}`}>{value ? (renderValue ? renderValue(value) : value) : placeholder}</span>
+          <Icon name="chevron-down" size={16} />
+        </button>
+        {open && (
+          <div className="select-menu" role="listbox">
+            {options.map((o) => (
+              <MenuOption
+                key={o}
+                label={o}
+                selected={o === value}
+                onSelect={() => {
+                  onChange(o);
+                  setOpen(false);
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+      <FieldError id={errorId} message={typeof error === 'string' ? error : undefined} />
+    </>
   );
 }
