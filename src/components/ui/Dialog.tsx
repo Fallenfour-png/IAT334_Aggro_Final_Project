@@ -24,13 +24,16 @@ export function Dialog({
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
-      document.removeEventListener('keydown', onKey);
       document.body.style.overflow = prev;
     };
-  }, [onClose]);
+  }, []);
 
   return createPortal(
     <div
@@ -178,11 +181,35 @@ export function NumberField({
 }
 
 export function DateField({ value, onChange, error }: { value: string; onChange: (v: string) => void; error?: boolean }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const openPicker = (event: React.MouseEvent | React.KeyboardEvent) => {
+    const input = inputRef.current;
+    if (!input || typeof input.showPicker !== 'function') return;
+    input.focus({ preventScroll: true });
+    try {
+      input.showPicker();
+      // Avoid the label forwarding a second click or the input toggling the picker again.
+      event.preventDefault();
+    } catch {
+      // Keep the native input's default interaction when showPicker is unavailable here.
+    }
+  };
+
   return (
-    <label className={`input date-input t-body ${error ? 'is-error' : ''}`}>
+    <label className={`input date-input t-body ${error ? 'is-error' : ''}`} onClick={openPicker}>
       <span>{value ? value.replace(/-/g, '/') : <span className="c-2">YYYY/MM/DD</span>}</span>
       <Icon name="calendar-16" size={16} />
-      <input type="date" value={value} onChange={(e) => onChange(e.target.value)} aria-label="Date" />
+      <input
+        ref={inputRef}
+        type="date"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') openPicker(event);
+        }}
+        aria-label="Date"
+        aria-invalid={error || undefined}
+      />
     </label>
   );
 }
