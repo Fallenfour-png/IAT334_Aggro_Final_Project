@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Icon } from '../../lib/icons';
 import { formatNumber, TODAY } from '../../lib/dates';
+import { useUnsavedChanges } from '../../lib/useUnsavedChanges';
 import { GOAL_UNIT, goalCurrent, goalPercent, isAutoGoal } from '../../state/selectors';
 import { newId, useStore } from '../../state/store';
 import { AUTO_GOAL_SOURCE, GOAL_TYPES, type Goal, type GoalType } from '../../state/types';
@@ -28,7 +29,7 @@ export function GoalDialog({ goal, defaultDate, onClose }: { goal?: Goal; defaul
   );
   const [draft, setDraft] = useState<Draft>(initial);
   const [tried, setTried] = useState(false);
-  const [confirm, setConfirm] = useState<'remove' | 'discard' | null>(null);
+  const [confirm, setConfirm] = useState<'remove' | null>(null);
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v }));
 
   const auto = draft.type !== '' && isAutoGoal(draft.type);
@@ -38,6 +39,7 @@ export function GoalDialog({ goal, defaultDate, onClose }: { goal?: Goal; defaul
   const current = auto ? autoCurrent : draft.current === '' ? 0 : draft.current;
 
   const dirty = JSON.stringify(draft) !== JSON.stringify(initial);
+  const { requestLeave, confirmation } = useUnsavedChanges(dirty);
   const targetError = draft.target !== '' && draft.target <= current && !(goal?.completedAt && draft.target === goal.target);
   const dateError = draft.due !== '' && draft.due < TODAY;
   const complete = draft.title.trim() !== '' && draft.type !== '' && draft.target !== '' && draft.due !== '';
@@ -49,7 +51,7 @@ export function GoalDialog({ goal, defaultDate, onClose }: { goal?: Goal; defaul
     due: !draft.due ? 'Choose a due date.' : dateError ? 'Choose today or a future date for the due date.' : undefined,
   };
 
-  const requestClose = () => (dirty ? setConfirm('discard') : onClose());
+  const requestClose = () => requestLeave(onClose);
 
   const save = (event: React.MouseEvent<HTMLButtonElement>) => {
     setTried(true);
@@ -72,13 +74,6 @@ export function GoalDialog({ goal, defaultDate, onClose }: { goal?: Goal; defaul
   };
 
   const unit = draft.type ? GOAL_UNIT[draft.type as GoalType] : undefined;
-  const discardBody = (() => {
-    if (!goal) return 'Your new goal hasn’t been saved. If you close now, it will be lost.';
-    const changed = (Object.keys(draft) as (keyof Draft)[]).filter((k) => draft[k] !== initial[k]);
-    if (changed.length === 1 && changed[0] === 'target')
-      return `You changed the target from ${formatNumber(initial.target as number)} to ${formatNumber((draft.target || 0) as number)}. If you close now, this change won’t be saved.`;
-    return 'You have unsaved changes. If you close now, they won’t be saved.';
-  })();
 
   return (
     <Dialog title={isNew ? 'Add Goal' : 'Edit Goal'} subtitle={isNew ? 'Add more goals for your milestone' : 'Edit your goal'} onClose={requestClose}>
@@ -162,17 +157,7 @@ export function GoalDialog({ goal, defaultDate, onClose }: { goal?: Goal; defaul
           }}
         />
       )}
-      {confirm === 'discard' && (
-        <StackedConfirm
-          tone="warning"
-          title="Discard your changes?"
-          body={discardBody}
-          cancelLabel="Keep editing"
-          confirmLabel="Discard changes"
-          onCancel={() => setConfirm(null)}
-          onConfirm={onClose}
-        />
-      )}
+      {confirmation}
     </Dialog>
   );
 }

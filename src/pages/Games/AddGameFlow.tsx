@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Icon } from '../../lib/icons';
 import { IMAGE_TYPES, readImage } from '../../lib/images';
 import { useClickOutside } from '../../lib/useClickOutside';
+import { useUnsavedChanges } from '../../lib/useUnsavedChanges';
 import { MenuOption } from '../../components/ui/Menu';
 import { accountOf } from '../../state/selectors';
 import { useStore } from '../../state/store';
@@ -91,11 +92,12 @@ function RoleSelect({ value, onChange, onRemove, compact }: { value: Member['rol
   );
 }
 
-function AddPeople({ team, onChange, onBack, onDone }: { team: Member[]; onChange: (t: Member[]) => void; onBack: () => void; onDone: () => void }) {
+function AddPeople({ team, onChange, onBack, onDone, email, setEmail, role, setRole }: {
+  team: Member[]; onChange: (t: Member[]) => void; onBack: () => void; onDone: () => void;
+  email: string; setEmail: (email: string) => void; role: Member['role']; setRole: (role: Member['role']) => void;
+}) {
   const { state } = useStore();
   const account = accountOf(state);
-  const [email, setEmail] = useState('');
-  const [role, setRole] = useState<Member['role']>('Can View');
   const clean = email.trim().toLowerCase();
   const already = clean === account.email.toLowerCase() || team.some((m) => m.email === clean);
   const canInvite = validEmail(clean) && !already;
@@ -190,10 +192,19 @@ export function AddGameFlow({ onClose, onOpen }: { onClose: () => void; onOpen: 
   const [coverError, setCoverError] = useState('');
   const [team, setTeam] = useState<Member[]>([]);
   const [created, setCreated] = useState('');
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState<Member['role']>('Can View');
+  const { requestLeave, confirmation } = useUnsavedChanges(step !== 'done' && !!(title || cover || team.length || inviteEmail || inviteRole !== 'Can View'));
+  const requestClose = () => requestLeave(onClose);
   const file = useRef<HTMLInputElement>(null);
   const name = title.trim();
 
-  if (step === 'people') return <AddPeople team={team} onChange={setTeam} onBack={() => setStep('game')} onDone={() => setStep('game')} />;
+  if (step === 'people') return (
+    <>
+      <AddPeople team={team} onChange={setTeam} email={inviteEmail} setEmail={setInviteEmail} role={inviteRole} setRole={setInviteRole} onBack={() => setStep('game')} onDone={() => setStep('game')} />
+      {confirmation}
+    </>
+  );
 
   if (step === 'done')
     return (
@@ -215,8 +226,8 @@ export function AddGameFlow({ onClose, onOpen }: { onClose: () => void; onOpen: 
     );
 
   return (
-    <Shell width={759} onClose={onClose} className="ob-add">
-      <RoundClose onClick={onClose} />
+    <Shell width={759} onClose={requestClose} className="ob-add">
+      <RoundClose onClick={requestClose} />
       <p className="t-h3 ob-add__title" style={{ color: '#000' }}>
         Add a game
       </p>
@@ -286,7 +297,7 @@ export function AddGameFlow({ onClose, onOpen }: { onClose: () => void; onOpen: 
       </div>
 
       <div className="ob-actions">
-        <button type="button" className="ob-btn ob-btn--outline" onClick={onClose}>
+        <button type="button" className="ob-btn ob-btn--outline" onClick={requestClose}>
           Cancel
         </button>
         <button
@@ -302,6 +313,7 @@ export function AddGameFlow({ onClose, onOpen }: { onClose: () => void; onOpen: 
           Next
         </button>
       </div>
+      {confirmation}
     </Shell>
   );
 }

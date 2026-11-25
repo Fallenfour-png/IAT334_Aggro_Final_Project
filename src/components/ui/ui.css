@@ -301,6 +301,15 @@
 }
 
 /* Stacked confirm inside a dialog */
+.unsaved-changes {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+}
+.unsaved-changes .confirm {
+  max-width: calc(100% - 32px);
+}
+
 .confirm-scrim {
   position: absolute;
   inset: 0;

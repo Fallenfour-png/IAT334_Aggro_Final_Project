@@ -5,6 +5,7 @@ import { MenuOption, Popover } from '../../components/ui/Menu';
 import { Toggle } from '../../components/ui/Toggle';
 import { Icon } from '../../lib/icons';
 import { useClickOutside } from '../../lib/useClickOutside';
+import { useUnsavedChanges } from '../../lib/useUnsavedChanges';
 import { useStore } from '../../state/store';
 import type { Connection, ConnectionId, ConnectionSettings } from '../../state/types';
 import { APP_TYPES, APPS, appById, defaultSettings, type AppDef, type AppTypeFilter, type FormItem, type PickerField } from './connectData';
@@ -380,7 +381,10 @@ function DisconnectConfirm({ app, onCancel, onConfirm }: { app: AppDef; onCancel
 function EditOverlay({ app, onClose }: { app: AppDef; onClose: () => void }) {
   const { state, setConnection } = useStore();
   const conn = state.connections.find((c) => c.id === app.id);
-  const [settings, setSettings] = useState<ConnectionSettings>(() => savedSettings(app, conn));
+  const [initial] = useState<ConnectionSettings>(() => savedSettings(app, conn));
+  const [settings, setSettings] = useState<ConnectionSettings>(initial);
+  const { requestLeave, confirmation } = useUnsavedChanges(JSON.stringify(settings) !== JSON.stringify(initial));
+  const requestClose = () => requestLeave(onClose);
   const [showErrors, setShowErrors] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const set = (k: string, v: ConnectionSettings[string]) => setSettings((s) => ({ ...s, [k]: v }));
@@ -396,14 +400,14 @@ function EditOverlay({ app, onClose }: { app: AppDef; onClose: () => void }) {
   };
 
   return (
-    <Dialog onClose={onClose} className="cx-dialog">
+    <Dialog onClose={requestClose} className="cx-dialog">
         <div className="cx-header">
           <img className="app-card__logo" src={app.logo} alt="" width={44} height={44} />
           <div className="cx-header__text">
             <p className="t-h3 c-1">{app.name}</p>
             <p className="t-body-2 c-2">{app.subtitle}</p>
           </div>
-          <CloseButton onClick={onClose} />
+          <CloseButton onClick={requestClose} />
         </div>
 
         {app.sections.map((sec) => (
@@ -439,6 +443,7 @@ function EditOverlay({ app, onClose }: { app: AppDef; onClose: () => void }) {
             }}
           />
         )}
+        {confirmation}
     </Dialog>
   );
 }

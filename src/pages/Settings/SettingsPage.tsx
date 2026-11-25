@@ -5,6 +5,7 @@ import { Dialog, FieldError, focusFirstInvalid, StackedConfirm } from '../../com
 import { GameCover, GameThumb } from '../../components/ui/GameCover';
 import { Toggle } from '../../components/ui/Toggle';
 import { parseDate, TODAY } from '../../lib/dates';
+import { useUnsavedChanges } from '../../lib/useUnsavedChanges';
 import { Icon } from '../../lib/icons';
 import { IMAGE_TYPES, readImage } from '../../lib/images';
 import { freshState } from '../../state/seeds';
@@ -121,9 +122,10 @@ function AvatarCircle({ account, size }: { account: Account; size: number }) {
 /** Figma "OV / Change Username": one text field + "Save changes". Also used for the project name. */
 function TextDialog({ title, subtitle, label, value, onSave, onClose }: { title: string; subtitle: string; label: string; value: string; onSave: (v: string) => void; onClose: () => void }) {
   const [text, setText] = useState(value);
+  const { requestLeave, confirmation } = useUnsavedChanges(text !== value);
   const clean = text.trim();
   return (
-    <Dialog onClose={onClose} title={title} subtitle={subtitle} className="st-dialog">
+    <Dialog onClose={() => requestLeave(onClose)} title={title} subtitle={subtitle} className="st-dialog">
       <div className="field">
         <p className="t-body c-2">{label}</p>
         <label className="input input--soft t-body">
@@ -144,6 +146,7 @@ function TextDialog({ title, subtitle, label, value, onSave, onClose }: { title:
           Save changes
         </button>
       </div>
+      {confirmation}
     </Dialog>
   );
 }
@@ -261,15 +264,17 @@ function VerifyDialog({
   const currentOk = !current || (first.sent && code1.length === 4);
   const nextValid = kind === 'email' ? validEmail(next.trim()) : validPhone(next);
   const done = currentOk && second.sent && code2.length === 4;
+  const { requestLeave, confirmation } = useUnsavedChanges(!!(next || code1 || code2 || first.sent || second.sent));
+  const requestClose = () => requestLeave(onClose);
 
   return (
-    <Dialog onClose={onClose} className="st-dialog">
+    <Dialog onClose={requestClose} className="st-dialog">
       <div className="dialog-header" style={{ alignItems: 'flex-start' }}>
         <div className="dialog-title">
           <p className="t-h3 c-1">{current ? `Change ${noun}` : `Add ${noun}`}</p>
           <p className="t-body-2 c-2">{current ? `You must verify your ${noun.toLowerCase()} before changing` : `We’ll send a code to verify your ${noun.toLowerCase()}`}</p>
         </div>
-        <SoftClose onClick={onClose} />
+        <SoftClose onClick={requestClose} />
       </div>
 
       {current && (
@@ -328,6 +333,7 @@ function VerifyDialog({
           </button>
         </div>
       )}
+      {confirmation}
     </Dialog>
   );
 }
@@ -339,6 +345,7 @@ function PasswordDialog({ onSaved, onClose }: { onSaved: () => void; onClose: ()
   const [pw, setPw] = useState('');
   const [again, setAgain] = useState('');
   const [tried, setTried] = useState(false);
+  const { requestLeave, confirmation } = useUnsavedChanges(!!(cur || pw || again));
   const short = pw.length < 8;
   const mismatch = pw !== again;
   const ok = cur && !short && !mismatch;
@@ -355,7 +362,7 @@ function PasswordDialog({ onSaved, onClose }: { onSaved: () => void; onClose: ()
     );
   };
   return (
-    <Dialog onClose={onClose} title="Change Password" subtitle="Use at least 8 characters" className="st-dialog">
+    <Dialog onClose={() => requestLeave(onClose)} title="Change Password" subtitle="Use at least 8 characters" className="st-dialog">
       {field('Current password', cur, setCur, tried && !cur ? 'Enter your current password.' : undefined)}
       {field('New password', pw, setPw, tried && short ? 'Enter a new password with at least 8 characters.' : undefined)}
       {field('Confirm new password', again, setAgain, tried && (!again || mismatch) ? 'Re-enter your new password so both passwords match.' : undefined)}
@@ -377,6 +384,7 @@ function PasswordDialog({ onSaved, onClose }: { onSaved: () => void; onClose: ()
           Save changes
         </button>
       </div>
+      {confirmation}
     </Dialog>
   );
 }

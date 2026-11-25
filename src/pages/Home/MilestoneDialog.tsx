@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '../../lib/icons';
 import { TODAY } from '../../lib/dates';
+import { useUnsavedChanges } from '../../lib/useUnsavedChanges';
 import { useClickOutside } from '../../lib/useClickOutside';
 import { newId, useStore } from '../../state/store';
 import { MILESTONE_TYPES, type GoalType, type Milestone, type MilestoneGoal, type MilestoneType } from '../../state/types';
@@ -110,10 +111,11 @@ export function MilestoneDialog({ milestone, defaultDate, onClose }: { milestone
   const [draft, setDraft] = useState<Draft>(initial);
   const [tried, setTried] = useState(false);
   const [newGoal, setNewGoal] = useState<{ metric: GoalType | ''; target: number | '' }>({ metric: '', target: '' });
-  const [confirm, setConfirm] = useState<'delete' | 'discard' | null>(null);
+  const [confirm, setConfirm] = useState<'delete' | null>(null);
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v }));
 
   const dirty = JSON.stringify(draft) !== JSON.stringify(initial) || newGoal.metric !== '' || newGoal.target !== '';
+  const { requestLeave, confirmation } = useUnsavedChanges(dirty);
   const dateError = draft.date !== '' && draft.date < TODAY && draft.date !== initial.date;
   const complete = draft.title.trim() !== '' && draft.type !== '' && draft.date !== '';
   const canSave = dirty && complete && !dateError;
@@ -124,7 +126,7 @@ export function MilestoneDialog({ milestone, defaultDate, onClose }: { milestone
   };
   const showEvent = draft.type === 'Event' || draft.type === 'Deliverable';
 
-  const requestClose = () => (dirty ? setConfirm('discard') : onClose());
+  const requestClose = () => requestLeave(onClose);
 
   const addGoalRow = () => {
     if (newGoal.metric === '' || newGoal.target === '') return;
@@ -254,17 +256,7 @@ export function MilestoneDialog({ milestone, defaultDate, onClose }: { milestone
           }}
         />
       )}
-      {confirm === 'discard' && (
-        <StackedConfirm
-          tone="warning"
-          title="Discard your changes?"
-          body={isNew ? 'Your new milestone hasn’t been saved. If you close now, it will be lost.' : 'You have unsaved changes. If you close now, they won’t be saved.'}
-          cancelLabel="Keep editing"
-          confirmLabel="Discard changes"
-          onCancel={() => setConfirm(null)}
-          onConfirm={onClose}
-        />
-      )}
+      {confirmation}
     </Dialog>
   );
 }

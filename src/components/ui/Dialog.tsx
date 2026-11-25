@@ -85,6 +85,8 @@ export function StackedConfirm({
   onCancel: () => void;
   onConfirm: () => void;
 }) {
+  const titleId = useId();
+  const bodyId = useId();
   return (
     <div
       className="confirm-scrim"
@@ -92,12 +94,12 @@ export function StackedConfirm({
         if (e.target === e.currentTarget) onCancel();
       }}
     >
-      <div className="confirm" role="alertdialog">
+      <div className="confirm" role="alertdialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={bodyId}>
         <div className={`confirm-icon confirm-icon--${tone}`}>
           <Icon name={tone === 'danger' ? 'trash-22' : 'warning-22'} size={22} />
         </div>
-        <p className="t-h4 c-1">{title}</p>
-        <p className="t-body-2 c-2">{body}</p>
+        <p id={titleId} className="t-h4 c-1">{title}</p>
+        <p id={bodyId} className="t-body-2 c-2">{body}</p>
         <div className="confirm-actions">
           <button type="button" className="btn btn--cancel t-btn" onClick={onCancel}>
             {cancelLabel}
