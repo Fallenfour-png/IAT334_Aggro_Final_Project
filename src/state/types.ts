@@ -204,6 +204,7 @@ export type DueWindow = (typeof DUE_WINDOWS)[number];
 
 export interface AppState {
   version: 2;
+  demoScheduleVersion?: 1 | 2;
   seed: 'demo' | 'fresh';
   project: Project | null;
   /** Optional so data saved before Settings existed still loads (see `accountOf`). */

@@ -68,7 +68,7 @@ export const RANGE_COMPARE: Record<Range, string> = {
   'Last 7 days': 'compared with the 7 days before',
   'Last 2 weeks': 'compared with the 2 weeks before',
   'Last 30 days': 'compared with the 30 days before',
-  'Since campaign start': 'since Jul 1',
+  'Since campaign start': 'since campaign start',
 };
 
 export const DUE_DAYS: Record<DueWindow, number> = {

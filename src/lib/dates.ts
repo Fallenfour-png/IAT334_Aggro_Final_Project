@@ -1,5 +1,5 @@
-// The prototype is set on Aug 6, 2026 (Day 37 of a 105-day campaign that launches Oct 14).
-export const TODAY = '2026-08-06';
+// Fixed demo reference date; sample deadlines span late November onward.
+export const TODAY = '2026-11-25';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 

@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { DEMO_KPIS, EVENTS, FUNDS, demoState, freshState } from './seeds';
 import { withGame, withNewGame } from './games';
 import { withTestData } from './testData';
+import { withCurrentDemoSchedule } from './demoSchedule';
 import { formatShort } from '../lib/dates';
 import { RANGES, type AppState, type Connection, type ConnectionId, type Member, type Workspace, type EventItem, type Fund, type Goal, type Milestone, type Notification, type Touchpoint } from './types';
 
@@ -14,7 +15,7 @@ function load(): AppState {
       const parsed = JSON.parse(raw) as AppState;
       if (parsed.version === 2) {
         if (!RANGES.includes(parsed.range)) parsed.range = 'Last 7 days';
-        return withNewCatalog(withNewKpis(parsed));
+        return withCurrentDemoSchedule(withNewCatalog(withNewKpis(parsed)));
       }
     }
   } catch {
