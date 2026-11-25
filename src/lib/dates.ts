@@ -1,5 +1,6 @@
-// Fixed demo reference date; sample deadlines span late November onward.
-export const TODAY = '2026-11-25';
+// Use the browser's local calendar date when the app loads.
+const now = new Date();
+export const TODAY = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
