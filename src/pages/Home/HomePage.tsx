@@ -63,7 +63,7 @@ export function HomePage() {
 
       {open?.kind === 'goal' && <GoalDialog key={open.goal?.id ?? 'new'} goal={open.goal} onClose={close} />}
       {open?.kind === 'milestone' && <MilestoneDialog key={open.milestone?.id ?? 'new'} milestone={open.milestone} onClose={close} />}
-      {touchpoint && <TouchpointDialog touchpoint={touchpoint} onClose={close} onEdit={newTouchpoint} />}
+      {touchpoint && <TouchpointDialog touchpoint={touchpoint} onClose={close} />}
     </AppLayout>
   );
 }

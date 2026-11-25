@@ -7,7 +7,7 @@ import { useStore } from '../../state/store';
 import type { Milestone, MilestoneType } from '../../state/types';
 import { FilterButton, FilterChips, MenuOption, Popover } from '../../components/ui/Menu';
 import { MilestoneRow, TouchpointRow } from '../Home/Cards';
-import { MetricTile, touchpointMetrics } from '../Home/TouchpointDialog';
+import { MetricTile, TouchpointEditDialog, touchpointMetrics } from '../Home/TouchpointDialog';
 import { barTone, metricCurrent, milestoneGoalStatus } from './planData';
 
 const PRETTY: Record<string, string> = {
@@ -194,6 +194,8 @@ export function PlanTouchpoints() {
   const { state } = useStore();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const editing = state.touchpoints.find((touchpoint) => touchpoint.id === editingId);
   const [type, setType] = useState<(typeof TP_TYPES)[number]>('All types');
   const [platform, setPlatform] = useState<(typeof TP_PLATFORMS)[number]>('All platforms');
   const toConnect = () => navigate('/connect');
@@ -314,7 +316,7 @@ export function PlanTouchpoints() {
                       <p className="expand-label" style={{ paddingTop: 0 }}>
                         ANALYTICS
                       </p>
-                      <button type="button" className="edit-tp-btn has-tip" aria-label="Edit touchpoint" onClick={toConnect}>
+                      <button type="button" className="edit-tp-btn has-tip" aria-label="Edit touchpoint" onClick={() => setEditingId(t.id)}>
                         <Icon name="edit-14" size={16} tint />
                         <span className="tip">Edit Touchpoint</span>
                       </button>
@@ -331,6 +333,7 @@ export function PlanTouchpoints() {
           })}
         </div>
       )}
+      {editing && <TouchpointEditDialog key={editing.id} touchpoint={editing} onClose={() => setEditingId(null)} />}
     </section>
   );
 }

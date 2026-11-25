@@ -492,7 +492,7 @@ export function AnalyticsPage() {
 
       {open?.kind === 'goal' && <GoalDialog key={open.goal.id} goal={open.goal} onClose={() => setOpen(null)} />}
       {open?.kind === 'milestone' && <MilestoneDialog key={open.milestone.id} milestone={open.milestone} onClose={() => setOpen(null)} />}
-      {open?.kind === 'touchpoint' && <TouchpointDialog touchpoint={open.t} onClose={() => setOpen(null)} onEdit={() => navigate('/connect')} />}
+      {open?.kind === 'touchpoint' && <TouchpointDialog touchpoint={open.t} onClose={() => setOpen(null)} />}
     </AppLayout>
   );
 }

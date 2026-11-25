@@ -201,7 +201,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         update((s) => {
           const exists = s.touchpoints.some((x) => x.id === t.id);
           return { ...s, touchpoints: exists ? s.touchpoints.map((x) => (x.id === t.id ? t : x)) : [t, ...s.touchpoints] };
-        }),
+        }, 'Touchpoint saved'),
     }),
     [state, toast, update, undoToast],
   );

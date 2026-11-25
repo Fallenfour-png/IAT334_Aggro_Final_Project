@@ -642,6 +642,27 @@
   gap: 24px;
 }
 
+.tp-caption {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.tp-caption-input {
+  height: auto;
+  padding: 12px 14px;
+}
+.tp-caption-input:focus-within {
+  padding: 11px 13px;
+}
+.tp-caption-input textarea {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  resize: vertical;
+  background: transparent;
+  color: inherit;
+}
+
 .tp-dialog__header {
   display: flex;
   gap: 20px;
